@@ -1,0 +1,42 @@
+---
+description: Readonly Data Transfer Object conventions with fromArray factory
+globs: **/DataObjects/**/*.php
+alwaysApply: false
+---
+
+# DTO / Data Object Conventions
+
+## Structure
+
+- Use `readonly class` with constructor promotion
+- Include a `static fromArray(array $data): static` factory method
+- Place in the relevant service's `DataObjects/` directory
+
+## Example
+
+```php
+readonly class CustomerData
+{
+    public function __construct(
+        public string $id,
+        public ?string $name,
+        public ?string $email,
+    ) {}
+
+    public static function fromArray(array $data): static
+    {
+        return new static(
+            id: (string) ($data['ID'] ?? $data['id'] ?? ''),
+            name: $data['Name'] ?? $data['name'] ?? null,
+            email: $data['Email'] ?? $data['email'] ?? null,
+        );
+    }
+}
+```
+
+## Rules
+
+- DTOs are immutable -- never add setters or mutable state
+- Handle API field name variations (PascalCase, camelCase) in `fromArray()`
+- Use nullable types for optional fields
+- Keep DTOs free of business logic -- they are data containers only

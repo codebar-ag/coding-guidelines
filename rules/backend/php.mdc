@@ -1,0 +1,31 @@
+---
+description: General PHP conventions -- strict typing, formatting, language
+globs: app/**/*.php
+alwaysApply: false
+---
+
+# PHP Conventions
+
+## Strict Typing
+
+- Type hints on **all** parameters, return types, and properties
+- Use union types or nullable (`?Type`) where needed -- no untyped signatures
+- Target **PHPStan Level 9** compliance
+
+## Language & Formatting
+
+- All code in **English**: variable names, comments, docblocks
+- Foreign-language domain terms from external APIs are acceptable in DTOs where they match the API
+- Run **Laravel Pint** before committing
+
+## Error Handling
+
+- Never swallow exceptions silently
+- Log context with structured arrays when catching exceptions
+- Re-throw or wrap exceptions with meaningful messages
+
+## General
+
+- Prefer immutability -- use `readonly` properties where possible
+- Prefer early returns over deep nesting
+- One class per file

@@ -1,0 +1,30 @@
+---
+description: Blade template conventions and best practices
+globs: resources/views/**/*.blade.php
+alwaysApply: false
+---
+
+# Blade Conventions
+
+## Components
+
+- Use Blade components (`<x-component>`) for reusable UI pieces
+- Prefer anonymous components for simple, presentation-only elements
+- Use class-based components when logic is needed
+
+## Output & Security
+
+- Use `{{ }}` for escaped output (default)
+- Use `{!! !!}` only when the content is explicitly safe (e.g. pre-sanitized HTML)
+- Never output raw user input unescaped
+
+## Structure
+
+- No inline `<style>` tags in Blade files
+- No inline `<script>` tags in Blade files -- use Livewire or Alpine.js via Blade directives
+- Keep all user-facing text in English
+
+## Formatting
+
+- Indent Blade directives consistently (4 spaces)
+- Use short attribute syntax where supported: `@class`, `@style`

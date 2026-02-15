@@ -1,0 +1,48 @@
+---
+description: PHPUnit test structure, naming, assertions, and factory conventions
+globs: tests/**/*.php
+alwaysApply: false
+---
+
+# PHPUnit Conventions
+
+## Test Structure
+
+- **Feature tests** go in `tests/Feature/` and extend `Tests\TestCase`
+  - Always use `Illuminate\Foundation\Testing\RefreshDatabase`
+  - Test full HTTP request/response cycles: controllers, routes, middleware
+- **Unit tests** go in `tests/Unit/` and extend `PHPUnit\Framework\TestCase`
+  - Test isolated classes: services, DTOs, enums
+  - No Laravel bootstrap -- pure PHP tests
+
+## Naming & Style
+
+- Use `test_` method prefix with snake_case names:
+
+```php
+public function test_user_can_create_resource(): void
+```
+
+- All test methods must have `: void` return type
+- One assertion concern per test method -- keep tests focused
+
+## Assertions
+
+- Prefer `assertSame` over `assertEquals` for strict type + value comparison
+- Assert specific values, not just truthiness
+- Use Laravel's HTTP assertions: `assertStatus`, `assertJson`, `assertRedirect`
+
+## Factories
+
+- Every new model **must** have a corresponding factory in `database/factories/`
+- Use factories in tests instead of manual `create()` / `insert()` calls
+- Define meaningful default values; use states for variations
+
+```php
+User::factory()->create();
+User::factory()->unverified()->create();
+```
+
+## Running Tests
+
+- Run `./vendor/bin/phpunit` before committing to verify no regressions

@@ -1,0 +1,25 @@
+---
+description: Database migration conventions -- always new files, naming, structure
+globs: database/migrations/**/*.php
+alwaysApply: false
+---
+
+# Migration Conventions
+
+## Rules
+
+- Always create **new** migration files for database changes
+- **Never** modify existing migration files
+- Use descriptive names: `create_invoices_table`, `add_status_to_invoices_table`
+
+## Structure
+
+- Use `up()` and `down()` methods -- `down()` should reverse the `up()` migration
+- Group related columns logically (IDs first, then data, then timestamps)
+- Use enum string values for status columns: `$table->string('status')->default('draft')`
+
+## Best Practices
+
+- Add indexes on columns used in WHERE clauses and foreign keys
+- Use `foreignId()->constrained()->cascadeOnDelete()` for foreign keys
+- Keep migrations focused -- one concern per migration

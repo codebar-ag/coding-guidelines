@@ -1,0 +1,46 @@
+---
+description: Eloquent model conventions -- guarded, casts, sections, activity log
+globs: app/Models/**/*.php
+alwaysApply: false
+---
+
+# Model Conventions
+
+## Structure
+
+- Use `$guarded = []` (no `$fillable` arrays)
+- Define `casts()` as a method, not a property
+- Group model code with section comment headers:
+
+```php
+// --- Relationships ---
+
+public function lines(): HasMany
+{
+    return $this->hasMany(InvoiceLine::class);
+}
+
+// --- Status Helpers ---
+
+public function isDraft(): bool
+{
+    return $this->status === Status::Draft;
+}
+
+// --- Activity Log ---
+
+public function getActivitylogOptions(): LogOptions
+{
+    return LogOptions::defaults()
+        ->logAll()
+        ->logOnlyDirty()
+        ->dontSubmitEmptyLogs();
+}
+```
+
+## Rules
+
+- Add `LogsActivity` trait on all business models
+- Cast enums, dates, decimals, and JSON in `casts()`
+- Use typed return types on all relationship methods (`HasMany`, `BelongsTo`, etc.)
+- Every new model must have a corresponding factory in `database/factories/`

@@ -1,0 +1,39 @@
+---
+description: Albatros accounting API integration -- Saloon connector, DTOs, pagination
+globs: app/Services/Albatros/**/*.php
+alwaysApply: false
+---
+
+# Albatros API Integration
+
+## Connector
+
+- `AlbatrosConnector` extends `Saloon\Http\Connector`
+- Token-based authentication with Mandant header
+- Base URL from `config('albatros.base_url')`
+
+## Service Class
+
+- `AlbatrosService` wraps all API calls
+- Returns typed DTOs or `Collection` of DTOs
+- Uses `Cache` for reference data (addresses, accounts, VAT codes, etc.)
+- Paginated endpoints use `fetchAllPages()` helper with `lastIndex` parameter
+
+## Request Organization
+
+- Requests organized by resource under `Requests/{Resource}/`:
+  - `Requests/Adresse/`, `Requests/PkKreditor/`, `Requests/Mandant/`, etc.
+- List requests accept `$lastIndex` and `$pageSize` for pagination
+- Create requests implement `HasBody` + `HasJsonBody`
+
+## Data Objects
+
+- Readonly DTOs in `DataObjects/` with `fromArray()` factory
+- **German domain terms are acceptable** in DTO property names and request classes (they match the Albatros API)
+- Handle API field name casing variations in `fromArray()`
+
+## Rules
+
+- Cache reference data to minimize API calls
+- Use `clearCache()` method when data needs refreshing
+- All monetary values as `decimal:2`

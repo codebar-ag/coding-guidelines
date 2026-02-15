@@ -1,0 +1,38 @@
+---
+description: Project-wide Laravel conventions that always apply
+alwaysApply: true
+---
+
+# Laravel General Conventions
+
+## Configuration
+
+- Use `config()` helper to read configuration values
+- **Never** use `env()` directly outside of config files
+- Add new config keys to the appropriate file in `config/`
+
+## Database
+
+- Use Eloquent or Query Builder -- no raw DB queries
+- Wrap multi-step writes in `DB::transaction()`
+
+## Logging
+
+- Use `Illuminate\Support\Facades\Log` with structured context arrays:
+
+```php
+Log::info('Action completed.', [
+    'model_id' => $model->id,
+    'result' => $result,
+]);
+```
+
+## Activity Logging
+
+- Add the `Spatie\Activitylog\Traits\LogsActivity` trait on all models that track business data
+- Configure `getActivitylogOptions()` with `logAll()`, `logOnlyDirty()`, `dontSubmitEmptyLogs()`
+- Use `activity()->performedOn($model)->log(...)` for manual log entries in jobs and controllers
+
+## Formatting
+
+- Run **Laravel Pint** on all PHP code before committing

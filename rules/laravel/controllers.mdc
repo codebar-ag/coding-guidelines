@@ -1,0 +1,36 @@
+---
+description: Controller conventions -- thin controllers, invokable, service delegation
+globs: app/Http/Controllers/**/*.php
+alwaysApply: false
+---
+
+# Controller Conventions
+
+## Thin Controllers
+
+- Keep controllers **thin** -- delegate business logic to services or jobs
+- Controllers handle: request validation, calling a service/job, returning a response
+- No direct database queries or complex logic in controller methods
+
+## Invokable Controllers
+
+- Use invokable controllers (`__invoke`) for single-action endpoints
+- Name the class after the action: `StoreInvoiceController`, `ProcessWebhookController`
+
+## Responses
+
+- Return JSON responses from API controllers
+- Return views from web controllers
+- Use appropriate HTTP status codes (200, 201, 422, etc.)
+
+## Example
+
+```php
+class ProcessWebhookController extends Controller
+{
+    public function __invoke(Request $request): JsonResponse
+    {
+        // validate, delegate to service/job, return response
+    }
+}
+```

@@ -1,0 +1,80 @@
+---
+description: Saloon-based service layer pattern for external API integrations
+globs: app/Services/**/*.php
+alwaysApply: false
+---
+
+# Saloon Service Pattern
+
+## Directory Structure
+
+Organize each external integration under `app/Services/{ServiceName}/`:
+
+```
+app/Services/{ServiceName}/
+  {ServiceName}Connector.php     # Saloon connector
+  {ServiceName}Service.php       # Service class (business logic)
+  Requests/
+    {Resource}/
+      Get{Resource}Request.php   # One class per endpoint
+      List{Resource}Request.php
+  DataObjects/
+    {Resource}Data.php           # Readonly DTO
+```
+
+## Connector
+
+- Extends `Saloon\Http\Connector`
+- Handles authentication (tokens, headers) and base URL
+- Registered as a singleton in a service provider when needed
+
+## Requests
+
+- One class per API endpoint, extends `Saloon\Http\Request`
+- Use constructor promotion for parameters
+- GET requests define `defaultQuery()` for query parameters
+- POST/PUT requests implement `HasBody` + use `HasJsonBody` trait with `defaultBody()`
+
+```php
+class ListItemsRequest extends Request
+{
+    protected Method $method = Method::GET;
+
+    public function __construct(
+        protected string $lastIndex = '',
+        protected int $pageSize = 100,
+    ) {}
+
+    public function resolveEndpoint(): string
+    {
+        return '/items/';
+    }
+
+    protected function defaultQuery(): array
+    {
+        return [
+            'last_index' => $this->lastIndex,
+            'page_size' => $this->pageSize,
+        ];
+    }
+}
+```
+
+## Service Class
+
+- Wraps the connector and sends requests
+- Returns typed DTOs or `Collection<int, SomeData>`
+- Uses `Cache` for expensive or frequently accessed data
+- Accepts an optional connector in the constructor for testability
+
+```php
+public function __construct(?SomeConnector $connector = null)
+{
+    $this->connector = $connector ?? new SomeConnector();
+}
+```
+
+## Rules
+
+- **All** new external API integrations must use the Saloon pattern
+- No raw HTTP calls (`Http::get(...)`, `file_get_contents`, `curl`)

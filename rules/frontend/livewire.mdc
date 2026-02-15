@@ -1,0 +1,26 @@
+---
+description: Livewire component patterns and conventions
+globs: app/Livewire/**/*.php
+alwaysApply: false
+---
+
+# Livewire Conventions
+
+## Livewire First
+
+- Use **Livewire** for all interactive UI -- no custom JavaScript unless absolutely necessary
+- Follow existing Livewire component patterns in the project
+- Keep component logic in the PHP class; keep Blade templates declarative
+
+## Component Structure
+
+- One Livewire component per feature/concern
+- Use public properties for reactive data
+- Use computed properties (`#[Computed]`) for derived data
+- Use `wire:model` for two-way binding, `wire:click` for actions
+
+## Rules
+
+- Keep components small and focused -- extract sub-components when they grow
+- Use form objects (`Livewire\Form`) for complex form handling
+- Dispatch events for cross-component communication

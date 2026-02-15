@@ -1,0 +1,25 @@
+---
+description: Tailwind CSS v4 styling conventions
+globs: resources/css/**
+alwaysApply: false
+---
+
+# Tailwind CSS Conventions
+
+## Utilities Only
+
+- **Tailwind CSS v4** utility classes only -- no custom CSS classes
+- Theme customization via `@theme` directive in `resources/css/app.css`
+- Do not create custom `.css` class selectors -- compose utilities in markup instead
+
+## Build
+
+- Vite is the build tool with `@tailwindcss/vite` plugin
+- Entry point: `resources/css/app.css`
+- Use `@source` directive to include Blade and Livewire paths for class scanning
+
+## Guidelines
+
+- Use responsive prefixes (`sm:`, `md:`, `lg:`) for responsive design
+- Use dark mode variant (`dark:`) when dark mode is supported
+- Keep utility strings readable -- extract Blade components for complex repeated patterns

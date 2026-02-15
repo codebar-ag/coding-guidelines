@@ -1,0 +1,25 @@
+---
+description: Route file conventions -- api vs web, grouping, model binding
+globs: routes/**/*.php
+alwaysApply: false
+---
+
+# Routing Conventions
+
+## File Organization
+
+- API routes in `routes/api.php`, web routes in `routes/web.php`
+- Group related routes with prefixes and middleware
+- Use route model binding where possible
+
+## Naming
+
+- Use resourceful route names: `invoices.index`, `invoices.store`
+- Use kebab-case for URL segments: `/invoice-lines`
+- Prefix API routes with `/api` (handled by Laravel automatically)
+
+## Middleware
+
+- Apply authentication middleware at the group level
+- Apply throttle middleware on API endpoints
+- Use custom middleware for webhook signature verification
