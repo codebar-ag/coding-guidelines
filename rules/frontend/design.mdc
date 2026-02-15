@@ -1,0 +1,42 @@
+---
+description: Component-first design system and responsive UI conventions
+globs: resources/views/**/*.blade.php
+alwaysApply: false
+---
+
+# Design System
+
+## Component-First
+
+- Every UI element MUST use a Blade component -- no raw `<button>`, `<input>`, `<table>`, `<textarea>`, or styled `<div>` badges in page views
+- Check the styleguide (`/styleguide`) for existing components before creating new ones
+- Every new component MUST be added to `config/styleguide.php` and have a styleguide section
+
+## Component Conventions
+
+- Use anonymous components for presentation-only elements
+- Accept `$attributes` and merge with defaults via `$attributes->merge(['class' => '...'])`
+- Use named slots (`$header`, `$trigger`, `$content`) for composable layouts
+- Props with `@props([...])` -- always provide sensible defaults
+
+## Responsive Design
+
+- Mobile-first: base styles for 320px+, `sm:` for 640px+, `lg:` for 1024px+
+- Tables must fall back to stacked cards on mobile
+- Tabs must remain usable on small screens
+- All interactive elements: `min-h-[44px]` touch targets
+
+## Visual Quality
+
+- Generous whitespace, subtle shadows (`shadow-sm`), smooth transitions (`transition ease-in-out duration-150`)
+- Consistent border radius: `rounded-lg` for containers, `rounded-full` for badges/pills
+- Color system: `primary-*` neutrals, `accent-*` brand, semantic (`green`, `red`, `orange`, `blue`) for status
+- Typography via `<x-heading>` component -- no raw `<h1>`-`<h6>` in page views
+- Hover/focus/disabled states on every interactive element
+
+## Accessibility
+
+- `focus-visible` rings on all interactive elements
+- ARIA labels for icon-only buttons
+- Keyboard navigation support
+- Screen-reader-only text (`sr-only`) where visual context is implicit

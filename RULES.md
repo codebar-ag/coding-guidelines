@@ -33,6 +33,7 @@ Rules for frontend technologies and templating.
 | File | Scope | Description |
 |------|-------|-------------|
 | `blade.mdc` | `resources/views/**/*.blade.php` | Blade template conventions |
+| `design.mdc` | `resources/views/**/*.blade.php` | Component-first design system and responsive UI conventions |
 | `livewire.mdc` | `app/Livewire/**/*.php` | Livewire component patterns |
 | `tailwind.mdc` | `resources/css/**` | Tailwind CSS v4 conventions |
 

@@ -78,3 +78,8 @@ public function __construct(?SomeConnector $connector = null)
 
 - **All** new external API integrations must use the Saloon pattern
 - No raw HTTP calls (`Http::get(...)`, `file_get_contents`, `curl`)
+
+## Exceptions
+
+- **Prism (`prism-php/prism`)**: Acceptable for AI/LLM integrations -- Prism is a purpose-built AI abstraction layer and does not need to be wrapped with Saloon
+- **Inline binary downloads**: Simple `Http::get()` for downloading files/images from a URL is acceptable when it is not an API integration (e.g., fetching an AI-generated image by URL)
