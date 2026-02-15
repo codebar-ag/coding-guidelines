@@ -20,12 +20,52 @@ alwaysApply: false
 
 ## Error Handling
 
+- Avoid `try-catch` blocks -- let exceptions bubble up to the framework's handler
+- Only catch exceptions when you **must** react locally (e.g., retry logic, API fallback)
+- When catching, keep the block minimal: log context with structured arrays and re-throw or wrap
 - Never swallow exceptions silently
-- Log context with structured arrays when catching exceptions
-- Re-throw or wrap exceptions with meaningful messages
+
+## Control Flow
+
+- Use **early returns** (guard clauses) to handle edge cases at the top of a method
+- Never use `else`, `elseif`, or nested `if` blocks -- invert the condition and return early instead
+- Each method should read as a straight-line happy path after the guards
+
+### Bad
+
+```php
+public function process(Order $order): void
+{
+    if ($order->isPaid()) {
+        if ($order->hasItems()) {
+            // ... deep logic
+        } else {
+            throw new EmptyOrderException();
+        }
+    } else {
+        throw new UnpaidOrderException();
+    }
+}
+```
+
+### Good
+
+```php
+public function process(Order $order): void
+{
+    if (! $order->isPaid()) {
+        throw new UnpaidOrderException();
+    }
+
+    if (! $order->hasItems()) {
+        throw new EmptyOrderException();
+    }
+
+    // ... happy-path logic
+}
+```
 
 ## General
 
 - Prefer immutability -- use `readonly` properties where possible
-- Prefer early returns over deep nesting
 - One class per file
