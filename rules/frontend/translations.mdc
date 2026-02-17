@@ -1,0 +1,47 @@
+---
+description: Translation and localization conventions
+globs: lang/**/*.php,lang/**/*.json,resources/views/**/*.blade.php,app/**/*.php
+alwaysApply: false
+---
+
+# Translation Conventions
+
+## Supported Locales
+
+This project supports **English (`en`)** and **German (`de`)**. Every user-facing string must be translated in both locales.
+
+## Key Types
+
+### Namespaced Keys (PHP Files)
+
+Use `lang/{locale}/{group}.php` for domain-specific strings:
+
+```php
+// lang/en/sprints.php
+'step_locked' => 'This step is locked.',
+// Usage: __('sprints.step_locked')
+```
+
+### JSON Keys (Plain Strings)
+
+Use `lang/{locale}.json` for generic, reusable strings:
+
+```json
+{ "Save": "Speichern", "Back": "Zurück" }
+```
+
+Usage: `__('Save')`, `__('Back')`
+
+## Rules
+
+1. **Never hardcode user-facing text** -- always use `__()` or `@lang()`
+2. **Add keys to both `en` and `de`** when creating new translations
+3. **Namespaced keys** for domain terms (e.g. `sprints.`, `organizations.`)
+4. **JSON keys** for generic UI labels (Save, Back, Cancel, etc.)
+5. **Use `:placeholder`** for dynamic values: `__('Configure the :provider API key.')`
+6. **Case matters** -- `Organizations.foo` is not the same as `organizations.foo`
+7. **Run translation tests** after changes: `php artisan test --filter=MissingTranslation`
+
+## Automated Detection
+
+`tests/Feature/Translation/MissingTranslationTest.php` scans all source files for `__()`, `trans()`, and `@lang()` calls and verifies every key exists in every locale. It also checks that PHP and JSON translation files have matching keys across locales.

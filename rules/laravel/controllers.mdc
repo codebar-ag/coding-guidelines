@@ -11,6 +11,7 @@ alwaysApply: false
 - Keep controllers **thin** -- delegate business logic to services or jobs
 - Controllers handle: request validation, calling a service/job, returning a response
 - No direct database queries or complex logic in controller methods
+- Use dedicated `FormRequest` classes for all validation -- never call `$request->validate()` or `Validator::make()` inside a controller
 
 ## Invokable Controllers
 

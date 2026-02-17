@@ -1,0 +1,55 @@
+---
+description: Dedicated Form Request validation classes for all controller input
+globs: app/Http/Requests/**/*.php,app/Http/Controllers/**/*.php
+alwaysApply: false
+---
+
+# Form Request Validation
+
+## Dedicated Classes
+
+- Every controller action that accepts user input **must** use a dedicated `FormRequest` class
+- Never call `$request->validate()` or `Validator::make()` inside a controller
+- Place Form Requests in `app/Http/Requests/` or a subdirectory matching the domain (e.g. `Auth/`)
+
+## Naming
+
+- Follow the pattern `Store{Resource}Request`, `Update{Resource}Request`
+- Match the resource name to the controller: `StoreSprintController` → `StoreSprintRequest`
+
+## Structure
+
+- Define `authorize(): bool` with proper authorization logic
+- Define `rules(): array` with a PHPDoc `@return` array shape
+- Use **array-based** rule definitions (not pipe-delimited strings)
+- Add `messages(): array` when validation messages need localization or clarity
+
+## Example
+
+```php
+class StoreSprintRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user() !== null;
+    }
+
+    /**
+     * @return array<string, array<int, string|object>>
+     */
+    public function rules(): array
+    {
+        return [
+            'title' => ['required', 'string', 'max:255'],
+            'locale' => ['required', Locale::validationRule()],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'title.required' => __('A title is required.'),
+        ];
+    }
+}
+```

@@ -21,10 +21,8 @@ Rules for test frameworks and static analysis tools.
 
 | File | Scope | Description |
 |------|-------|-------------|
-| `phpunit.mdc` | `tests/**/*.php` | PHPUnit test structure, naming, assertions, factories |
-| `phpstan.mdc` | Always | PHPStan Level 9 compliance |
-
-Future additions: `pest.mdc`, `dusk.mdc`, `larastan.mdc`
+| `phpunit.mdc` | `tests/**/*.php` | PHPUnit test structure, naming, assertions, and factory conventions |
+| `phpstan.mdc` | Always | PHPStan Level 9 static analysis compliance |
 
 ### frontend/
 
@@ -32,12 +30,11 @@ Rules for frontend technologies and templating.
 
 | File | Scope | Description |
 |------|-------|-------------|
-| `blade.mdc` | `resources/views/**/*.blade.php` | Blade template conventions |
+| `blade.mdc` | `resources/views/**/*.blade.php` | Blade template conventions and best practices |
 | `design.mdc` | `resources/views/**/*.blade.php` | Component-first design system and responsive UI conventions |
-| `livewire.mdc` | `app/Livewire/**/*.php` | Livewire component patterns |
-| `tailwind.mdc` | `resources/css/**` | Tailwind CSS v4 conventions |
-
-Future additions: `alpine.mdc`, `inertia.mdc`
+| `livewire.mdc` | `app/Livewire/**/*.php` | Livewire component patterns and conventions |
+| `tailwind.mdc` | `resources/css/**` | Tailwind CSS v4 styling conventions |
+| `translations.mdc` | `lang/**/*.php,lang/**/*.json,resources/views/**/*.blade.php,app/**/*.php` | Translation and localization conventions |
 
 ### backend/
 
@@ -45,10 +42,10 @@ Rules for general PHP backend conventions (not Laravel-specific).
 
 | File | Scope | Description |
 |------|-------|-------------|
-| `php.mdc` | `app/**/*.php` | Strict typing, formatting, error handling |
-| `enums.mdc` | `app/Enums/**/*.php` | Backed string enum conventions |
-| `dto.mdc` | `**/DataObjects/**/*.php` | Readonly DTO pattern |
-| `jobs.mdc` | `app/Jobs/**/*.php` | Queued job conventions |
+| `php.mdc` | `app/**/*.php` | General PHP conventions -- strict typing, formatting, language |
+| `enums.mdc` | `app/Enums/**/*.php` | PHP backed enum conventions with label and color helpers |
+| `dto.mdc` | `**/DataObjects/**/*.php` | Readonly Data Transfer Object conventions with fromArray factory |
+| `jobs.mdc` | `app/Jobs/**/*.php` | Queued job conventions with retries, backoff, and structured logging |
 
 ### laravel/
 
@@ -56,11 +53,12 @@ Rules for Laravel framework conventions.
 
 | File | Scope | Description |
 |------|-------|-------------|
-| `general.mdc` | Always | Config, logging, formatting, activity log |
-| `models.mdc` | `app/Models/**/*.php` | Eloquent model conventions |
-| `controllers.mdc` | `app/Http/Controllers/**/*.php` | Thin controller pattern |
-| `migrations.mdc` | `database/migrations/**/*.php` | Migration conventions |
-| `routing.mdc` | `routes/**/*.php` | Route organization |
+| `general.mdc` | Always | Project-wide Laravel conventions that always apply |
+| `models.mdc` | `app/Models/**/*.php` | Eloquent model conventions -- guarded, casts, sections, activity log |
+| `controllers.mdc` | `app/Http/Controllers/**/*.php` | Controller conventions -- thin controllers, invokable, service delegation |
+| `migrations.mdc` | `database/migrations/**/*.php` | Database migration conventions -- always new files, naming, structure |
+| `form-requests.mdc` | `app/Http/Requests/**/*.php,app/Http/Controllers/**/*.php` | Dedicated Form Request validation classes for all controller input |
+| `routing.mdc` | `routes/**/*.php` | Route file conventions -- api vs web, grouping, model binding |
 
 ### services/
 
@@ -68,11 +66,9 @@ Rules for external API integrations. Add a new file for each service.
 
 | File | Scope | Description |
 |------|-------|-------------|
-| `saloon.mdc` | `app/Services/**/*.php` | General Saloon service pattern |
-| `docuware.mdc` | `app/Services/DocuWare/**/*.php` | DocuWare integration |
-| `albatros.mdc` | `app/Services/Albatros/**/*.php` | Albatros accounting API |
-
-Future additions: `stripe.mdc`, `mailgun.mdc`, etc.
+| `saloon.mdc` | `app/Services/**/*.php` | Saloon-based service layer pattern for external API integrations |
+| `docuware.mdc` | `app/Services/DocuWare/**/*.php` | DocuWare integration patterns -- connector, webhook, import lifecycle |
+| `albatros.mdc` | `app/Services/Albatros/**/*.php` | Albatros accounting API integration -- Saloon connector, DTOs, pagination |
 
 ## How to Add a New Rule
 
