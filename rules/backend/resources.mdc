@@ -1,5 +1,6 @@
 ---
 description: Resource conventions — API resources, collections, and response shaping
+globs: app/Http/Resources/**/*.php
 alwaysApply: false
 ---
 

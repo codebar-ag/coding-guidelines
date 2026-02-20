@@ -1,5 +1,6 @@
 ---
 description: Middleware conventions — HTTP request and response pipeline
+globs: app/Http/Middleware/**/*.php
 alwaysApply: false
 ---
 

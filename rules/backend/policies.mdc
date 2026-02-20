@@ -1,5 +1,6 @@
 ---
 description: Policy conventions — authorization logic for models and resources
+globs: app/Policies/**/*.php
 alwaysApply: false
 ---
 
@@ -16,6 +17,7 @@ alwaysApply: false
 - Authorizing CRUD operations on a specific model
 - Any `can` / `cannot` check tied to a model and a user
 - Keeping authorization out of controllers, actions, and models
+- Generate one for each Model!
 
 ## When NOT to Use a Policy
 - Application-wide gates not tied to a model → use `Gate::define()` in `AuthServiceProvider`

@@ -1,5 +1,6 @@
 ---
 description: Command conventions — command classes, how to use them, and what belongs in them
+globs: app/Console/Commands/**/*.php
 alwaysApply: false
 ---
 

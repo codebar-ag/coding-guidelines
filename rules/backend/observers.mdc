@@ -1,5 +1,6 @@
 ---
 description: Observer conventions — reacting to Eloquent model lifecycle events
+globs: app/Observers/**/*.php
 alwaysApply: false
 ---
 
@@ -67,6 +68,7 @@ class UserObserver
 
 ## Registering an Observer
 Register observers in `AppServiceProvider` using the `observe()` method:
+
 
 ```php
 // AppServiceProvider

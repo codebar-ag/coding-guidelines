@@ -1,5 +1,6 @@
 ---
 description: Trait conventions — when to use traits, how to write them, and what belongs in them
+globs: app/Traits/**/*.php
 alwaysApply: false
 ---
 

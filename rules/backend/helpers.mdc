@@ -1,7 +1,6 @@
-HELPERS
-
 ---
 description: Helper conventions -- helper classes how to use and what belongs into it
+globs: app/Helpers/**/*.php
 alwaysApply: false
 ---
 # Helper Conventions

@@ -1,5 +1,6 @@
 ---
 description: Action conventions — single-purpose business logic classes
+globs: app/Actions/**/*.php
 alwaysApply: false
 ---
 

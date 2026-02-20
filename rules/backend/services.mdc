@@ -1,5 +1,6 @@
 ---
 description: Service conventions — complex orchestration across multiple domains
+globs: app/Services/**/*.php
 alwaysApply: false
 ---
 

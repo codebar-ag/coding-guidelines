@@ -1,5 +1,6 @@
 ---
 description: Job conventions — queueable units of work for background processing
+globs: app/Job/**/*.php
 alwaysApply: false
 ---
 
