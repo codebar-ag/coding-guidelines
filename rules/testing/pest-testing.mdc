@@ -1,110 +1,99 @@
 ---
-description: Pest 4 PHP testing conventions — unit, feature, browser, and architecture tests
+description: Pest PHP testing conventions — unit, feature, browser, and architecture tests
 globs: tests/**/*.php
 alwaysApply: false
 ---
 
-# Pest 4 Testing
+# Pest Testing Conventions
 
-## Quick Reference
-
-| Task | Command |
-|------|---------|
-| Create test | `php artisan make:test --pest {Name}Test` |
-| Run all | `php artisan test --compact` |
-| Run one file | `php artisan test --compact tests/Feature/UserTest.php` |
-| Run by name | `php artisan test --compact --filter=testName` |
-| API docs | `search-docs` |
-
----
-
-## Non-Negotiable Rules
-
-- ✅ **Always use Pest** — no raw PHPUnit syntax
-- ✅ **Always follow AAA**: Arrange → Act → Assert (comment each section)
-- ✅ **Always use specific assertions** — never `assertStatus(int)`
-- ❌ **Never delete tests** without explicit approval
-
----
-
-## Directory Structure
-
+## Structure
 ```
 tests/
-├── Feature/        # HTTP, DB, integration tests
-├── Unit/           # Pure logic, no framework dependencies
-├── Browser/        # Full browser integration (real browsers)
-└── Architecture/   # Convention enforcement
+├── Feature/        # HTTP, database, and integration tests
+├── Unit/           # Pure logic — no framework dependencies
+├── Browser/        # Full browser flows via Laravel Dusk
+└── Architecture/   # Convention enforcement via arch()
 ```
+
+Generate tests via Artisan:
+```bash
+php artisan make:test --pest FeatureName Test
+```
+
+## Naming
+- Test files mirror the class they test: `UserController` → `UserControllerTest.php`
+- Test descriptions read as plain English sentences: `it('creates an invoice for the given order')`
+- Group related tests with `describe()` named after the class or feature under test
+
+## Non-Negotiable Rules
+- Always use **Pest syntax** — never raw PHPUnit classes or `$this->assert*` outside of HTTP responses
+- Always follow **AAA**: Arrange → Act → Assert, with a comment for each section
+- Always use **named HTTP assertion methods** — never `assertStatus(int)` with a raw integer
+- Never delete a test without explicit approval
 
 ---
 
 ## Test Anatomy
 
-### Basic test (AAA pattern)
-
+### Basic Test — AAA Pattern
+Every test follows Arrange → Act → Assert. Always label each section with a comment:
 ```php
-it('creates a user', function () {
+it('creates an invoice for the given order', function () {
     // Arrange
-    $data = User::factory()->make()->toArray();
+    $order = Order::factory()->create();
 
     // Act
-    $response = $this->postJson('/api/users', $data);
+    $response = $this->postJson('/api/invoices', ['order_id' => $order->id]);
 
     // Assert
-    $response->assertSuccessful();
-    expect(User::count())->toBe(1);
+    $response->assertCreated();
+    expect(Invoice::count())->toBe(1);
 });
 ```
 
-### Grouping with `describe`
-
-Use `describe` to group related tests — improves output readability:
-
+### Grouping with `describe()`
+Use `describe()` to group tests by controller, feature, or concept — improves output readability and makes `beforeEach` scope clear:
 ```php
-describe('UserController', function () {
-    it('lists users', function () { ... });
-    it('creates a user', function () { ... });
-    it('deletes a user', function () { ... });
+describe('InvoiceController', function () {
+    it('lists all invoices', function () { ... });
+    it('creates an invoice', function () { ... });
+    it('deletes a draft invoice', function () { ... });
 });
 ```
 
-### Shared setup with `beforeEach` / `afterEach`
-
+### Shared Setup with `beforeEach()`
+Use `beforeEach()` inside a `describe()` block to set up shared state. Never repeat setup across tests:
 ```php
-describe('PostController', function () {
+describe('InvoiceController', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
     });
 
-    it('creates a post', function () {
-        $this->postJson('/api/posts', ['title' => 'Hello'])
-            ->assertSuccessful();
+    it('creates an invoice', function () {
+        $this->postJson('/api/invoices', ['order_id' => 1])
+            ->assertCreated();
     });
 });
 ```
 
-### Database reset
-
-Add `uses(RefreshDatabase::class)` at the top of any file that touches the DB:
-
+### Database Reset
+Add `uses(RefreshDatabase::class)` at the top of every test file that touches the database:
 ```php
 uses(RefreshDatabase::class);
 
-it('stores a record', function () {
-    // DB is fresh for every test in this file
+it('stores an invoice record', function () {
+    // DB is freshly migrated for every test in this file
 });
 ```
 
 ---
 
-## Assertions
+## HTTP Assertions
+Always use named assertion methods — never `assertStatus()` with a raw integer:
 
-### HTTP responses — use specific methods
-
-| ✅ Use | ❌ Avoid | Status |
-|--------|---------|--------|
+| Use | Never | Status |
+|-----|-------|--------|
 | `assertSuccessful()` | `assertStatus(200)` | 2xx |
 | `assertCreated()` | `assertStatus(201)` | 201 |
 | `assertNoContent()` | `assertStatus(204)` | 204 |
@@ -113,49 +102,52 @@ it('stores a record', function () {
 | `assertUnauthorized()` | `assertStatus(401)` | 401 |
 | `assertNotFound()` | `assertStatus(404)` | 404 |
 
-### `expect()` chaining
+---
 
+## `expect()` Assertions
+Use `expect()` for all non-HTTP assertions. Chain properties for concise, readable assertions:
 ```php
-expect($user)
-    ->name->toBe('Jane')
-    ->email->toContain('@')
-    ->role->toBeIn(['admin', 'editor']);
+expect($invoice)
+    ->status->toBe(InvoiceStatus::Draft)
+    ->total->toBe(10000)
+    ->user_id->toBe($this->user->id);
 
 expect($collection)
     ->toHaveCount(3)
-    ->each->toBeInstanceOf(Post::class);
+    ->each->toBeInstanceOf(Invoice::class);
 ```
 
 ---
 
 ## Datasets
-
-Use instead of duplicating tests for multiple inputs, validation rules, or edge cases:
-
+Use datasets instead of duplicating tests for multiple inputs, validation rules, or edge cases:
 ```php
-it('rejects invalid emails', function (string $email) {
-    $this->postJson('/register', ['email' => $email])
+it('rejects invalid email addresses', function (string $email) {
+    $this->postJson('/api/users', ['email' => $email])
         ->assertUnprocessable();
 })->with([
-    'empty'       => [''],
-    'missing @'   => ['notanemail'],
-    'missing tld' => ['user@domain'],
-    'with spaces' => ['user @domain.com'],
+    'empty string'     => [''],
+    'missing @'        => ['notanemail'],
+    'missing tld'      => ['user@domain'],
+    'whitespace'       => ['user @domain.com'],
 ]);
 ```
 
 ---
 
 ## Mocking
-
-**Always import before use:**
-
+For events, mail, notifications, and queues, always prefer **Laravel fakes** over mocks — they are simpler, more readable, and less brittle:
 ```php
+// ✓ Prefer Laravel fakes
+Event::fake();
+Mail::fake();
+Notification::fake();
+Queue::fake();
+
+// ✓ Use mock() only when you need to assert method calls on a class
 use function Pest\Laravel\mock;
-```
 
-```php
-it('sends a welcome email', function () {
+it('sends a welcome email on registration', function () {
     // Arrange
     mock(WelcomeMailer::class)
         ->shouldReceive('send')
@@ -168,107 +160,106 @@ it('sends a welcome email', function () {
 });
 ```
 
-For events, notifications, and queues prefer **Laravel fakes** over mocks:
-
+Always import `mock` before use:
 ```php
-Event::fake();
-Notification::fake();
-Mail::fake();
-Queue::fake();
+use function Pest\Laravel\mock;
 ```
 
 ---
 
 ## Browser Tests
+Browser tests live in `tests/Browser/` and use Laravel Dusk. See `dusk.md` for full conventions. Key rules that always apply:
 
-**Rules:**
-- Live in `tests/Browser/`
-- Always call `assertNoJavaScriptErrors()`
-- Use `uses(RefreshDatabase::class)` for clean state
-- Laravel fakes (`Notification::fake()`, etc.) work as normal
-
+- Always use `DatabaseTruncation` — never `RefreshDatabase` in browser tests
+- Always call `assertNoJavaScriptErrors()` after every `visit()`
+- Always use `dusk=""` HTML attributes as selectors — never CSS classes or IDs
+- Never use `pause()` — use `waitFor()`, `waitForText()`, or `waitUntilMissing()` instead
 ```php
-uses(RefreshDatabase::class);
+uses(DatabaseTruncation::class);
 
-it('resets the password', function () {
+it('user can submit an invoice', function () {
     // Arrange
-    Notification::fake();
     $user = User::factory()->create();
 
-    // Act + Assert (browser tests interleave these)
-    visit('/sign-in')
-        ->assertSee('Sign In')
-        ->assertNoJavaScriptErrors()
-        ->click('Forgot Password?')
-        ->fill('email', $user->email)
-        ->click('Send Reset Link')
-        ->assertSee('We have emailed your password reset link!');
-
-    Notification::assertSent(ResetPassword::class);
+    // Act + Assert
+    $this->browse(function (Browser $browser) use ($user) {
+        $browser->loginAs($user)
+                ->visit('/invoices/create')
+                ->assertNoJavaScriptErrors()
+                ->type('@amount-input', '100')
+                ->press('@submit-button')
+                ->waitForText('Invoice created')
+                ->assertSee('Invoice created');
+    });
 });
-```
-
-**Available interactions:**
-
-| Category | Methods |
-|----------|---------|
-| Navigation | `visit()`, `back()`, `forward()` |
-| Input | `fill()`, `select()`, `check()`, `uncheck()` |
-| Actions | `click()`, `submit()`, `scroll()`, `drag()` |
-| Assertions | `assertSee()`, `assertNoJavaScriptErrors()`, `assertNoConsoleLogs()` |
-| Debug | `screenshot()`, `pause()` |
-
-**Cross-browser / responsive:** Pass browser or device config when the task requires it.
-
----
-
-## Smoke Testing
-
-Quickly validate multiple routes have no JS errors — useful for CI sanity checks:
-
-```php
-visit(['/', '/about', '/pricing', '/contact'])
-    ->assertNoJavaScriptErrors()
-    ->assertNoConsoleLogs();
 ```
 
 ---
 
 ## Architecture Tests
-
-Enforce code conventions automatically. Lives in `tests/Architecture/`:
-
+Enforce structural conventions automatically. Lives in `tests/Architecture/`. Add a test for every convention defined in the coding guidelines:
 ```php
-// Naming & inheritance conventions
-arch('controllers')
+// Naming conventions
+arch('controllers have the correct suffix')
     ->expect('App\Http\Controllers')
-    ->toExtendNothing()
     ->toHaveSuffix('Controller');
 
 arch('models extend Eloquent')
     ->expect('App\Models')
     ->toExtend(Model::class);
 
-// No debug statements in production code
-arch('no debug calls')
-    ->expect('App')
-    ->not->toUse(['dd', 'dump', 'var_dump', 'ray']);
+arch('actions have the correct suffix')
+    ->expect('App\Actions')
+    ->toHaveSuffix('');
 
-// Services must not depend on the HTTP layer
-arch('services are framework-agnostic')
+// Layer isolation — services must not depend on the HTTP layer
+arch('services do not use HTTP requests')
     ->expect('App\Services')
     ->not->toUse(['Illuminate\Http\Request']);
+
+// No debug statements left in production code
+arch('no debug calls in production code')
+    ->expect('App')
+    ->not->toUse(['dd', 'dump', 'var_dump', 'ray', 'ddd']);
 ```
 
 ---
 
+## Running Tests
+```bash
+# Run all tests
+php artisan test --compact
+
+# Run a single file
+php artisan test --compact tests/Feature/InvoiceTest.php
+
+# Run by test name
+php artisan test --compact --filter=creates_an_invoice
+
+# Re-run only failures
+php artisan dusk:fails  # browser tests only
+```
+
+---
+
+## What Belongs in Each Layer
+
+| Layer | Test Type | Uses DB | Uses Browser |
+|---|---|---|---|
+| `Unit/` | Pure class and method logic | No | No |
+| `Feature/` | HTTP endpoints, DB interactions | Yes | No |
+| `Browser/` | Full user flows with JavaScript | Yes | Yes |
+| `Architecture/` | Convention enforcement | No | No |
+
 ## Common Pitfalls
 
 | Mistake | Fix |
-|---------|-----|
+|---|---|
 | `assertStatus(200)` | Use `assertSuccessful()` |
-| Missing `use function Pest\Laravel\mock;` | Import at top of file |
-| No `assertNoJavaScriptErrors()` in browser tests | Always chain after `visit()` |
-| Repeating tests with different inputs | Use datasets |
-| Missing `uses(RefreshDatabase::class)` | Add to every file that touches the DB |
-| Deleting tests | Never — get explicit approval first |
+| `RefreshDatabase` in browser tests | Use `DatabaseTruncation` |
+| `pause(3000)` in browser tests | Use `waitFor()` or `waitForText()` |
+| Repeating tests for different inputs | Use datasets |
+| CSS class selectors in Dusk | Use `dusk=""` attributes |
+| Missing `uses(RefreshDatabase::class)` | Add to every feature/unit file touching the DB |
+| Missing `assertNoJavaScriptErrors()` | Chain after every `visit()` in browser tests |
+| Deleting a test | Never — get explicit approval first |
