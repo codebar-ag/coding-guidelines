@@ -1,49 +1,96 @@
 ---
-description: Queued job conventions with retries, backoff, and structured logging
-globs: app/Jobs/**/*.php
+description: Job conventions — queueable units of work for background processing
 alwaysApply: false
 ---
 
-# Queued Job Conventions
+# Job Conventions
 
 ## Structure
+- Job classes live in `app/Jobs/`
+- Jobs are **queueable units of work** that execute a single task in the background
 
-- Implement `ShouldQueue` for all heavy or async work
-- Use standard traits: `Dispatchable`, `InteractsWithQueue`, `Queueable`, `SerializesModels`
-- Define `$tries` and `$backoff` for retry strategy
-- Implement `failed()` method for permanent failure handling
+## Naming
+- Use a clear verb-noun pattern: `ProcessInvoicePayment`, `SendWeeklyReport`, `ImportProductCsv`
+- The name should describe what the job does, not when it runs
 
-## Example
+## When to Use a Job
+- Work that can be deferred and does not need to block the HTTP response (sending emails, generating PDFs, processing imports)
+- Long-running operations that would otherwise time out in a web request
+- Retryable operations where failure handling and retry logic is important
+
+## When NOT to Use a Job
+- Work that must complete synchronously before returning a response → call the **Action** directly
+- Simple, fast operations that don't justify queue overhead → inline in the **Action**
+
+## Writing a Job
+Jobs delegate their work to an **Action** or **Service** — they are responsible for queue configuration and failure handling, not business logic:
 
 ```php
-class ProcessImport implements ShouldQueue
+namespace App\Jobs;
+
+use App\Actions\ProcessInvoicePayment;
+use App\Models\Invoice;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Throwable;
+
+class ProcessInvoicePaymentJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
-    public array $backoff = [30, 120, 300];
+    public int $backoff = 60;
 
     public function __construct(
-        public Model $model
+        private readonly Invoice $invoice,
     ) {}
 
-    public function handle(SomeService $service): void
+    public function handle(ProcessInvoicePayment $action): void
     {
-        // processing logic
+        $action->execute($this->invoice);
     }
 
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
-        Log::error('Job permanently failed.', [
-            'model_id' => $this->model->id,
-            'error' => $exception->getMessage(),
-        ]);
+        // Notify, log, or alert on permanent failure after all retries
     }
 }
 ```
 
-## Logging
+## Queue Configuration
+Always declare queue configuration explicitly on the job class rather than relying on defaults:
 
-- Log context at each stage: started, completed, failed
-- Use structured arrays with relevant IDs and metadata
-- Use `activity()` for audit-trail logging alongside `Log::` for operational logging
+```php
+public int $tries = 3;           // Number of retry attempts
+public int $backoff = 60;        // Seconds between retries
+public int $timeout = 120;       // Max execution time in seconds
+public string $queue = 'invoices'; // Named queue for prioritisation
+```
+
+## Dispatching a Job
+Dispatch from an **Action** or **Controller** after the triggering operation completes:
+
+```php
+// Dispatch immediately to the queue
+ProcessInvoicePaymentJob::dispatch($invoice);
+
+// Dispatch with a delay
+ProcessInvoicePaymentJob::dispatch($invoice)->delay(now()->addMinutes(5));
+
+// Dispatch synchronously (bypasses the queue — useful in tests)
+ProcessInvoicePaymentJob::dispatchSync($invoice);
+```
+
+## What Belongs in a Job
+- Queue configuration (`$tries`, `$backoff`, `$timeout`, `$queue`)
+- Passing the correct dependencies to `handle()`
+- `failed()` method for permanent failure handling (notifications, alerts, logging)
+- Model serialization via `SerializesModels`
+
+## What Does NOT Belong in a Job
+- Business logic → **Actions** or **Services**
+- Complex query building → **Services** or **Model scopes**
+- HTTP concerns → **Controllers**

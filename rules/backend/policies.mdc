@@ -1,0 +1,102 @@
+---
+description: Policy conventions — authorization logic for models and resources
+alwaysApply: false
+---
+
+# Policy Conventions
+
+## Structure
+- Policy classes live in `app/Policies/`
+- Policies centralise **all authorization logic** for a given model in one place
+
+## Naming
+- `PascalCase` with a `Policy` suffix, named after the model they protect: `InvoicePolicy`, `PostPolicy`
+
+## When to Use a Policy
+- Authorizing CRUD operations on a specific model
+- Any `can` / `cannot` check tied to a model and a user
+- Keeping authorization out of controllers, actions, and models
+
+## When NOT to Use a Policy
+- Application-wide gates not tied to a model → use `Gate::define()` in `AuthServiceProvider`
+- Simple role checks that never vary by resource instance → a middleware or global gate may be simpler
+
+## Writing a Policy
+Define one method per ability. Each method receives the authenticated user and optionally the model instance:
+
+```php
+namespace App\Policies;
+
+use App\Models\Invoice;
+use App\Models\User;
+
+class InvoicePolicy
+{
+    public function viewAny(User $user): bool
+    {
+        return $user->isAdmin();
+    }
+
+    public function view(User $user, Invoice $invoice): bool
+    {
+        return $user->id === $invoice->user_id || $user->isAdmin();
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->hasVerifiedEmail();
+    }
+
+    public function update(User $user, Invoice $invoice): bool
+    {
+        return $user->id === $invoice->user_id && $invoice->isDraft();
+    }
+
+    public function delete(User $user, Invoice $invoice): bool
+    {
+        return $user->isAdmin();
+    }
+}
+```
+
+## Registering a Policy
+Laravel auto-discovers policies that follow the `ModelPolicy` naming convention. For custom locations, register manually in `AuthServiceProvider`:
+
+```php
+protected $policies = [
+    Invoice::class => InvoicePolicy::class,
+];
+```
+
+## Using Policies
+Always enforce authorization at the controller level — never inside actions or services:
+
+```php
+// Via controller helper
+public function update(UpdateInvoiceRequest $request, Invoice $invoice): InvoiceResource
+{
+    $this->authorize('update', $invoice);
+
+    // ...
+}
+
+// Via Form Request
+public function authorize(): bool
+{
+    return $this->user()->can('update', $this->route('invoice'));
+}
+
+// Via middleware on the route
+Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])
+    ->middleware('can:update,invoice');
+```
+
+## What Belongs in a Policy
+- Per-ability authorization logic for a model
+- Checks against the authenticated user and the model instance
+- Role or ownership based access control
+
+## What Does NOT Belong in a Policy
+- Business logic → **Actions** or **Services**
+- Validation → **Form Requests**
+- Complex query constraints → **Model scopes** or **Services**

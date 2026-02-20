@@ -1,0 +1,98 @@
+---
+description: Action conventions — single-purpose business logic classes
+alwaysApply: false
+---
+
+# Action Conventions
+
+## Structure
+- Action classes live in `app/Actions/`
+- Each action represents **one single business operation** — if you can't describe it in a single sentence, split it up
+
+## Naming
+- Use a clear verb-noun pattern: `CreateInvoice`, `SendPasswordResetEmail`, `ArchiveExpiredSubscriptions`
+- Never use vague names like `InvoiceAction` or `UserHandler`
+
+## When to Use an Action
+- A single, well-defined business operation that is triggered from a controller, command, or job
+- Logic that is too complex for a controller but doesn't need to orchestrate multiple services
+- Operations that may be reused across different entry points (HTTP, CLI, queue)
+
+## When NOT to Use an Action
+- Simple one-liners that don't justify a class → keep inline
+- Multi-step orchestration across several domains → use a **Service**
+- Shared utility logic → use a **Helper**
+
+## Writing an Action
+Actions expose a single public `execute()` method. Keep the constructor for dependency injection only:
+
+```php
+namespace App\Actions;
+
+use App\Models\Invoice;
+use App\Models\Order;
+use App\Notifications\InvoiceCreatedNotification;
+
+class CreateInvoice
+{
+    public function __construct(
+        private readonly GenerateInvoicePdf $generatePdf,
+    ) {}
+
+    public function execute(Order $order): Invoice
+    {
+        $invoice = Invoice::create([
+            'order_id'   => $order->id,
+            'amount'     => $order->total,
+            'due_date'   => now()->addDays(30),
+        ]);
+
+        $this->generatePdf->execute($invoice);
+
+        $order->user->notify(new InvoiceCreatedNotification($invoice));
+
+        return $invoice;
+    }
+}
+```
+
+## What Belongs in an Action
+- The business logic for one specific operation
+- Calls to other actions, helpers, or notifications
+- Model creation, updates, or deletions tied to that operation
+- Dispatching events or notifications as a result of the operation
+
+## What Does NOT Belong in an Action
+- HTTP concerns (request, response, redirects) → **Controller**
+- Multi-domain orchestration → **Service**
+- Reusable formatting or utility logic → **Helper**
+- Authorization → **Policy**
+
+## Usage
+Actions are resolved via the service container and called from controllers, commands, or jobs:
+
+```php
+// Controller
+class InvoiceController extends Controller
+{
+    public function store(StoreInvoiceRequest $request, CreateInvoice $action): JsonResponse
+    {
+        $order = Order::findOrFail($request->validated('order_id'));
+
+        $invoice = $action->execute($order);
+
+        return new JsonResponse(new InvoiceResource($invoice), 201);
+    }
+}
+
+// Command
+class GenerateInvoicesCommand extends Command
+{
+    public function handle(CreateInvoice $action): int
+    {
+        Order::pending()->each(fn ($order) => $action->execute($order));
+
+        return self::SUCCESS;
+    }
+}
+```

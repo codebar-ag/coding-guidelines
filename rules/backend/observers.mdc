@@ -1,0 +1,92 @@
+---
+description: Observer conventions — reacting to Eloquent model lifecycle events
+alwaysApply: false
+---
+
+# Observer Conventions
+
+## Structure
+- Observer classes live in `app/Observers/`
+- Observers react to **Eloquent model lifecycle events** in a centralised, dedicated class
+
+## Naming
+- `PascalCase` with an `Observer` suffix, named after the model they observe: `UserObserver`, `InvoiceObserver`
+
+## When to Use an Observer
+- Reacting to model events (`created`, `updated`, `deleted`) that should always fire regardless of where the model is mutated
+- Side effects that belong to the model's lifecycle: sending notifications, clearing cache, writing audit logs
+- When multiple events on the same model all need handling — grouping them in one observer is cleaner than multiple listeners
+
+## When NOT to Use an Observer
+- When the side effect is specific to one particular action → trigger it explicitly inside that **Action**
+- Complex orchestration → **Service**
+- When you need fine-grained control over when the side effect fires (observers always fire)
+
+## Writing an Observer
+Only define the event methods you actually need — do not scaffold empty methods:
+
+```php
+namespace App\Observers;
+
+use App\Models\User;
+use App\Notifications\WelcomeNotification;
+use Illuminate\Support\Facades\Cache;
+
+class UserObserver
+{
+    public function created(User $user): void
+    {
+        $user->notify(new WelcomeNotification());
+    }
+
+    public function updated(User $user): void
+    {
+        Cache::forget("user:{$user->id}");
+    }
+
+    public function deleted(User $user): void
+    {
+        Cache::forget("user:{$user->id}");
+    }
+}
+```
+
+## Available Lifecycle Events
+| Method       | Fires when...                          |
+|--------------|----------------------------------------|
+| `creating`   | Before a model is first saved          |
+| `created`    | After a model is first saved           |
+| `updating`   | Before an existing model is saved      |
+| `updated`    | After an existing model is saved       |
+| `saving`     | Before creating or updating            |
+| `saved`      | After creating or updating             |
+| `deleting`   | Before a model is deleted              |
+| `deleted`    | After a model is deleted               |
+| `restoring`  | Before a soft-deleted model is restored |
+| `restored`   | After a soft-deleted model is restored  |
+
+## Registering an Observer
+Register observers in `AppServiceProvider` using the `observe()` method:
+
+```php
+// AppServiceProvider
+use App\Models\User;
+use App\Observers\UserObserver;
+
+public function boot(): void
+{
+    User::observe(UserObserver::class);
+}
+```
+
+## What Belongs in an Observer
+- Notifications triggered by model lifecycle events
+- Cache invalidation tied to model changes
+- Audit logging on create, update, or delete
+- Setting default attribute values before creation (`creating`)
+
+## What Does NOT Belong in an Observer
+- Business logic that should be explicitly controlled → **Action**
+- Complex multi-model orchestration → **Service**
+- Validation → **Form Request**
+- Authorization → **Policy**
