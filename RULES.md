@@ -23,6 +23,8 @@ Rules for test frameworks and static analysis tools.
 |------|-------|-------------|
 | `phpunit.mdc` | `tests/**/*.php` | PHPUnit test structure, naming, assertions, and factory conventions |
 | `phpstan.mdc` | Always | PHPStan Level 9 static analysis compliance |
+| `pest-testing.mdc` | Laravel Testing Framework Pest 4 |
+
 
 ### frontend/
 
