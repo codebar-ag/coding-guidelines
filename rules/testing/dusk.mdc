@@ -1,0 +1,261 @@
+---
+description: Dusk conventions — browser (end-to-end) testing with Laravel Dusk
+alwaysApply: false
+---
+
+# Dusk Conventions
+
+## What Dusk Is For
+Laravel Dusk is for **end-to-end (E2E) browser tests** — tests that drive a real Chrome browser to verify full user flows: filling forms, clicking buttons, navigating between pages, and asserting what the user sees. It is not a replacement for unit or feature tests; use it only where a real browser interaction is required (JavaScript, Vue/React components, multi-step flows).
+
+## Structure
+```
+tests/
+└── Browser/
+    ├── Pages/          # Page Objects
+    ├── Components/     # Reusable Dusk components
+    └── LoginTest.php   # Test files
+```
+
+Generate tests, pages, and components via Artisan:
+```bash
+php artisan dusk:make LoginTest
+php artisan dusk:page LoginPage
+php artisan dusk:component DatePicker
+```
+
+## Naming
+- Test classes: verb-noun describing the flow being tested → `LoginTest`, `CheckoutFlowTest`, `InvoiceCreationTest`
+- Test methods: plain English sentence describing what is verified → `test_user_can_log_in_with_valid_credentials`
+- Page Objects: named after the page → `LoginPage`, `DashboardPage`, `InvoicePage`
+
+## Database Reset
+Never use `RefreshDatabase` in Dusk tests — it uses transactions that are not visible across HTTP processes. Use `DatabaseTruncation` (preferred for speed) or `DatabaseMigrations`:
+
+```php
+// ✓ Preferred — fast, truncates tables between tests
+class LoginTest extends DuskTestCase
+{
+    use DatabaseTruncation;
+}
+
+// ✓ Acceptable — re-runs migrations each test, slower
+class LoginTest extends DuskTestCase
+{
+    use DatabaseMigrations;
+}
+
+// ✗ Never — transactions are invisible to the browser process
+class LoginTest extends DuskTestCase
+{
+    use RefreshDatabase;
+}
+```
+
+## Writing a Test
+Use the `browse()` method to get a `Browser` instance. Chain interactions to read like a user story:
+
+```php
+namespace Tests\Browser;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Laravel\Dusk\Browser;
+use Tests\DuskTestCase;
+
+class LoginTest extends DuskTestCase
+{
+    use DatabaseTruncation;
+
+    public function test_user_can_log_in_with_valid_credentials(): void
+    {
+        $user = User::factory()->create();
+
+        $this->browse(function (Browser $browser) use ($user) {
+            $browser->visit('/login')
+                ->type('email', $user->email)
+                ->type('password', 'password')
+                ->press('Login')
+                ->assertPathIs('/dashboard')
+                ->assertSee('Welcome back');
+        });
+    }
+
+    public function test_user_cannot_log_in_with_invalid_credentials(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/login')
+                ->type('email', '[email protected]')
+                ->type('password', 'wrong-password')
+                ->press('Login')
+                ->assertPathIs('/login')
+                ->assertSee('These credentials do not match');
+        });
+    }
+}
+```
+
+## Dusk Selectors
+Prefer `dusk` HTML attributes over CSS classes or IDs for targeting elements. CSS classes and IDs change for styling reasons; `dusk` attributes are stable and intent-driven:
+
+```html
+<!-- ✓ Use dusk attributes in your Blade/HTML -->
+<button dusk="submit-invoice">Submit</button>
+<input dusk="email-input" type="email" name="email">
+```
+
+```php
+// ✓ Target by dusk attribute in tests
+$browser->click('@submit-invoice')
+        ->assertSee('Invoice submitted');
+
+// ✗ Avoid fragile CSS selectors
+$browser->click('.btn-primary')
+        ->click('#submit');
+```
+
+## Page Objects
+Extract repeated navigation and selectors into a Page Object when a page is tested in multiple test classes. Pages define the URL, an assertion to confirm you are on the right page, and shorthand element selectors:
+
+```php
+namespace Tests\Browser\Pages;
+
+use Laravel\Dusk\Browser;
+use Laravel\Dusk\Page;
+
+class InvoicePage extends Page
+{
+    public function __construct(private readonly int $invoiceId) {}
+
+    public function url(): string
+    {
+        return "/invoices/{$this->invoiceId}";
+    }
+
+    // Asserted automatically when navigating to this page
+    public function assert(Browser $browser): void
+    {
+        $browser->assertPathIs($this->url());
+    }
+
+    // Shorthand selectors — use @alias syntax in tests
+    public function elements(): array
+    {
+        return [
+            '@mark-paid-button' => '[dusk="mark-paid-button"]',
+            '@status-badge'     => '[dusk="invoice-status"]',
+        ];
+    }
+
+    // Reusable page-level actions
+    public function markAsPaid(Browser $browser): void
+    {
+        $browser->click('@mark-paid-button')
+                ->waitForText('Invoice marked as paid');
+    }
+}
+```
+
+```php
+// Usage in a test
+$this->browse(function (Browser $browser) use ($invoice) {
+    $browser->visit(new InvoicePage($invoice->id))
+            ->markAsPaid()
+            ->assertSeeIn('@status-badge', 'Paid');
+});
+```
+
+## Components
+Extract repeated interactive UI elements (date pickers, modals, dropdowns) into Dusk Components so the interaction logic lives in one place:
+
+```php
+namespace Tests\Browser\Components;
+
+use Laravel\Dusk\Browser;
+use Laravel\Dusk\Component;
+
+class DatePickerComponent extends Component
+{
+    public function selector(): string
+    {
+        return '[dusk="date-picker"]';
+    }
+
+    public function assert(Browser $browser): void
+    {
+        $browser->assertVisible($this->selector());
+    }
+
+    public function selectDate(Browser $browser, string $date): void
+    {
+        $browser->type('@date-input', $date)
+                ->press('@confirm-date');
+    }
+}
+```
+
+```php
+// Usage in a test
+$browser->with(new DatePickerComponent, function (Browser $datePicker) {
+    $datePicker->selectDate('2026-04-01');
+});
+```
+
+## Waiting for Elements
+Never use `pause()` with hardcoded milliseconds — it makes tests slow and brittle. Always wait for a specific condition:
+
+```php
+// ✗ Never — arbitrary sleep
+$browser->pause(3000);
+
+// ✓ Wait for an element to appear
+$browser->waitFor('@invoice-table');
+
+// ✓ Wait for text to appear (e.g. after async action)
+$browser->waitForText('Invoice created');
+
+// ✓ Wait for a Vue or React component to finish loading
+$browser->waitUntilMissing('@loading-spinner');
+```
+
+## Authentication
+Use `loginAs()` to log in as a model instance without going through the login form — keeps tests focused on the feature being tested:
+
+```php
+$this->browse(function (Browser $browser) use ($user) {
+    $browser->loginAs($user)
+            ->visit('/dashboard')
+            ->assertSee('Welcome');
+});
+```
+
+## Running Tests
+```bash
+# Run all Dusk tests
+php artisan dusk
+
+# Re-run only failed tests
+php artisan dusk:fails
+
+# Run a specific test class
+php artisan dusk --filter=LoginTest
+```
+
+## Environment
+Always create a dedicated `.env.dusk.local` file so Dusk uses a separate test database and does not touch your development data:
+
+```ini
+APP_URL=http://localhost
+DB_DATABASE=my_app_dusk
+```
+
+## What Belongs in a Dusk Test
+- Full user flows that require JavaScript or real browser rendering
+- Multi-step interactions: forms, modals, redirects, toasts
+- Assertions on what the user sees after an action
+
+## What Does NOT Belong in a Dusk Test
+- Pure business logic → **Unit tests** or **Feature tests**
+- JSON API responses → **Feature tests** (faster, no browser needed)
+- Simple model operations → **Unit tests**
+- Anything that does not require a real browser
