@@ -1,1 +1,23 @@
-.idea
+# Dependencies
+/vendor/
+node_modules/
+
+# Composer
+composer.lock
+composer.phar
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP / Testing
+.phpunit.result.cache
+.php-cs-fixer.cache
+coverage/
+.phpunit.cache/
