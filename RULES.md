@@ -12,9 +12,14 @@ resources/boost/skills/
   models/            # Eloquent models
   actions/           # Action pattern
   blade/             # Blade templates
+  design/            # Component-first design system
   livewire/          # Livewire components
+  tailwind/          # Tailwind CSS v4 styling
+  translations/      # Translation and localization
   phpunit/           # PHPUnit tests
   saloon/            # Saloon API integrations
+  docuware/          # DocuWare document management
+  albatros/          # Albatros accounting API
   ...                # See README for full list
 ```
 

@@ -1,6 +1,6 @@
 # Coding Guidelines
 
-Shared Laravel AI coding guidelines and skills for codebar-ag projects. A Boost-first Composer package that ships 30+ skills for consistent conventions across PHP, Laravel, testing, frontend, and services.
+Shared Laravel AI coding guidelines and skills for codebar-ag projects. A Boost-first Composer package that ships 36 skills for consistent conventions across PHP, Laravel, testing, frontend, and services.
 
 **Rule index:** See [RULES.md](RULES.md) for the full rule structure and file reference.
 
@@ -12,11 +12,11 @@ Shared Laravel AI coding guidelines and skills for codebar-ag projects. A Boost-
 |----------|--------|-------------|
 | **Laravel** | General, HelperFunctions, Models, Controllers, Migrations, Routing, FormRequests | Framework conventions, config/logging, Eloquent, routes, validation |
 | **Backend** | Actions, Commands, DTO, Enums, Events, Exceptions, Helpers, Interfaces, Jobs, Middleware, Observers, Policies, Requests, Resources, Services, Traits | PHP architecture, single-purpose classes, API resources, queue jobs |
-| **Frontend** | Blade, Livewire | Templates, components, reactive UI |
+| **Frontend** | Blade, Design, Livewire, Tailwind, Translations | Templates, design system, components, Tailwind CSS, i18n |
 | **Testing** | PHPUnit, PestTesting, PHPStan, Dusk | Unit/feature tests, static analysis, browser tests |
-| **Services** | Saloon | External API integrations (Saloon pattern) |
+| **Services** | Saloon, DocuWare, Albatros | External API integrations (Saloon, DocuWare, Albatros) |
 
-**Total: 30 skills.** Each skill includes Rules, Examples, Anti-Patterns, and References.
+**Total: 36 skills.** Each skill includes Rules, Examples, Anti-Patterns, and References.
 
 ---
 
