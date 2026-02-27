@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a feature test test_user_can_create_invoice. Use RefreshDatabase, factories, actingAs.
+      Assert 201 and assertDatabaseHas. Use test_ prefix and : void return type.
+model: openai/gpt-4o
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

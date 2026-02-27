@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a StripeConnector extending Saloon Connector with resolveBaseUrl and defaultHeaders.
+      Write a ListChargesRequest for GET. No Http::get() or raw HTTP. Use Saloon pattern.
+model: openai/gpt-4o
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a UserObserver with created() that sends WelcomeNotification, and updated()/deleted() that clear cache.
+      Use Observer suffix. Only define methods you need. No business logic.
+model: openai/gpt-4o
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 384

@@ -1,0 +1,17 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a StoreInvoiceRequest with authorize() and rules() returning array-based rules.
+      Rules: order_id required exists in orders, amount required numeric min 0.
+      Add PHPDoc @return for rules().
+model: openai/gpt-4o
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

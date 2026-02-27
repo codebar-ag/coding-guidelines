@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a migration to create an invoices table with id, order_id (foreign key), status (string default draft), amount (decimal), timestamps.
+      Use foreignId()->constrained()->cascadeOnDelete(). Include both up() and down() methods.
+model: openai/gpt-4o
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

@@ -1,0 +1,80 @@
+name: Skill Integration
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/prompts/**"
+      - ".github/workflows/skill-integration.yml"
+      - ".github/scripts/validate-skill-response.sh"
+      - "resources/boost/skills/**"
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  models: read
+
+jobs:
+  skill-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        skill:
+          - general
+          - helperfunctions
+          - models
+          - controllers
+          - migrations
+          - routing
+          - formrequests
+          - actions
+          - commands
+          - dto
+          - enums
+          - events
+          - exceptions
+          - helpers
+          - interfaces
+          - jobs
+          - middleware
+          - observers
+          - policies
+          - requests
+          - resources
+          - services
+          - traits
+          - blade
+          - design
+          - livewire
+          - tailwind
+          - translations
+          - phpunit
+          - pesttesting
+          - phpstan
+          - dusk
+          - php
+          - saloon
+          - docuware
+          - albatros
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare skill content
+        run: |
+          cp "resources/boost/skills/${{ matrix.skill }}/SKILL.md" /tmp/skill-content.txt
+
+      - name: Test ${{ matrix.skill }} skill
+        id: infer
+        uses: actions/ai-inference@v2
+        with:
+          prompt-file: .github/prompts/${{ matrix.skill }}.prompt.yml
+          file_input: |
+            skill_content: /tmp/skill-content.txt
+
+      - name: Validate response
+        run: |
+          chmod +x .github/scripts/validate-skill-response.sh
+          .github/scripts/validate-skill-response.sh "${{ matrix.skill }}" "${{ steps.infer.outputs.response }}"

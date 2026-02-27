@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write the resources/css/app.css for Tailwind v4 with @theme directive setting --color-primary-500 and --font-sans.
+      Include @source for views and Livewire. No custom CSS classes.
+model: openai/gpt-4o
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 384

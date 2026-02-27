@@ -33,6 +33,9 @@
             ]
         }
     },
+    "scripts": {
+        "validate-skills": "php scripts/validate-skills.php"
+    },
     "config": {
         "sort-packages": true
     },

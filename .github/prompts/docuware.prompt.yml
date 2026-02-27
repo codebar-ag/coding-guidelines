@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a DocuWareService that wraps the DocuWare connector. Constructor accepts optional connector for testability.
+      Use config('laravel-docuware.credentials.*') not env(). Include fetchDocument or similar method signature.
+model: openai/gpt-4o
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

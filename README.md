@@ -6,6 +6,17 @@ Shared Laravel AI coding guidelines and skills for codebar-ag projects. A Boost-
 
 ---
 
+## CI
+
+GitHub Actions run on push and pull requests:
+
+- **CI workflow** — Composer validate, PHP syntax check, skill structure validation (frontmatter, count)
+- **Skill Integration** — AI-powered verification: one test prompt per skill (36 total), sends to GitHub Models, validates responses follow guidelines. Runs on prompt/skill changes, weekly schedule, and manual trigger. Requires `models: read` and GitHub Models access.
+
+Run validation locally: `composer validate-skills`
+
+---
+
 ## Skills Summary
 
 | Category | Skills | Description |
