@@ -1,37 +1,55 @@
 # Coding Guidelines
 
-Shared Cursor AI rules for codebar-ag Laravel projects. See [RULES.md](RULES.md) for the full rule index.
+Shared Cursor AI rules and skills for codebar-ag Laravel projects. The AI uses these to follow consistent conventions for PHP, Laravel, testing, frontend, and services.
 
-## Install
+**Rule index:** See [RULES.md](RULES.md) for the full rule structure and file reference.
 
-From your Laravel project root:
+---
 
-1. `git clone --depth 1 git@github.com:codebar-ag/coding-guidelines.git guidelines`
-2. Add `/guidelines` to your `.gitignore`
-3. `mkdir -p .cursor/rules && cp guidelines/guidelines.mdc .cursor/rules/guidelines.mdc`
+## Prerequisites
 
-## Update
+- A Laravel project where you want to use these guidelines
+- [Laravel Boost](https://github.com/laravel/boost) (for syncing rules/skills into your project)
 
-`git -C guidelines pull`
+---
 
-## Auto-update on Composer
+## 1. Install Laravel Boost
 
-Add this to your `composer.json` scripts to pull the latest guidelines on every `composer update`:
+In your Laravel project:
 
-```json
-"scripts": {
-    "post-update-cmd": [
-        "git -C guidelines pull --quiet 2>&1 || true"
-    ]
-}
+```bash
+composer require laravel/boost --dev
+php artisan boost:install
 ```
 
-## Audit & Refactor
+---
 
-Paste this into Cursor Agent to analyze and fix the entire repo against all rules:
+## 2. Activate the MCP server (optional)
 
+If your editor supports MCP (Model Context Protocol), configure it to use the Boost MCP server so the AI has full context. See the [Laravel Boost documentation](https://github.com/laravel/boost) for your editor’s setup.
+
+---
+
+## 3. Add and sync the guidelines
+
+Choose one of the following depending on how you work with this repo.
+
+### When you are **not** pulling from `main`
+
+1. Copy the **`skills`** folder from this repo into your AI config folder (e.g. `.cursor/skills` or your editor’s equivalent).
+2. In your Laravel project, run:
+
+   ```bash
+   php artisan boost:update
+   ```
+
+### When you **are** pulling from the `main` branch (recommended)
+
+In your Laravel project, add this repo as a Boost skill source and update:
+
+```bash
+php artisan boost:add-skill codebar-ag/coding-guidelines
+php artisan boost:update
 ```
-Read all rule files in guidelines/rules/. Analyze the full repository against every rule.
-For each violation: report the file, line, what the rule expects, then fix it in place.
-Work category by category: backend, laravel, testing, frontend, services in the order they make most sense.
-```
+
+After this, the AI in your project will automatically use the rules and skills from this repository.
