@@ -17,6 +17,7 @@ permissions:
 
 jobs:
   skill-tests:
+    if: false  # Disabled until GitHub Models 403 is fixed
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
