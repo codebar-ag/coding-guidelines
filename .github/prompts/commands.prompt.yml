@@ -10,7 +10,7 @@ messages:
     content: |
       Write an Artisan command invoices:send-reminders with required email argument and --dry-run option.
       Delegate to SendInvoiceReminderAction. Return self::SUCCESS or self::FAILURE. Validate input.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

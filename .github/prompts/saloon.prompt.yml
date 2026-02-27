@@ -10,7 +10,7 @@ messages:
     content: |
       Write a StripeConnector extending Saloon Connector with resolveBaseUrl and defaultHeaders.
       Write a ListChargesRequest for GET. No Http::get() or raw HTTP. Use Saloon pattern.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

@@ -10,7 +10,7 @@ messages:
     content: |
       Write a Dusk test that logs in, visits /invoices/create, uses dusk="" selectors, calls assertNoJavaScriptErrors().
       Use DatabaseTruncation. Use loginAs(), waitForText, never pause().
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

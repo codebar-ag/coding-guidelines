@@ -10,7 +10,7 @@ messages:
     content: |
       Write an InvoiceAlreadyPaidException that extends RuntimeException. It receives an Invoice as readonly property
       and sets a clear message via parent::__construct(). Use a named failure state.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 384

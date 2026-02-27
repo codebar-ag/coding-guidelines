@@ -10,7 +10,7 @@ messages:
     content: |
       Write API routes for invoices: index and store. Use auth:sanctum middleware, apiResource, and resourceful route names.
       Group them properly. Use kebab-case for URL.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 384

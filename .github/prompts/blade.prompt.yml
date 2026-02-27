@@ -10,7 +10,7 @@ messages:
     content: |
       Write a Blade component that displays a user's name and email. Use {{ }} for escaped output.
       No inline style or script tags. Use x-component syntax.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 384

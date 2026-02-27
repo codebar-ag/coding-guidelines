@@ -10,7 +10,7 @@ messages:
     content: |
       Write an InvoicePaid event (plain data container with Invoice) and a SendInvoicePaidNotification listener.
       Event uses Dispatchable, SerializesModels. Listener has single responsibility. Use past-tense for event name.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

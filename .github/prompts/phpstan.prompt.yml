@@ -10,7 +10,7 @@ messages:
     content: |
       Write a method process(Order $order): Invoice with full type hints. Add PHPDoc @return array<string, array<int, string|object>> for a rules() method.
       Use union types instead of mixed. No @phpstan-ignore.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

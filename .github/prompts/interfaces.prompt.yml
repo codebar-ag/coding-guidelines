@@ -10,7 +10,7 @@ messages:
     content: |
       Write a PaymentGateway interface in app/Contracts/ with charge(Order, int) and refund(string, int) methods.
       Return a PaymentResult. No implementation. Clear noun describing the capability.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 384

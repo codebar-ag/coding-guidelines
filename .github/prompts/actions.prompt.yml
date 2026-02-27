@@ -10,7 +10,7 @@ messages:
     content: |
       Write a CreateInvoice Action class. It receives an Order, creates an Invoice, and returns it.
       Use execute() method and constructor dependency injection. No HTTP concerns.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

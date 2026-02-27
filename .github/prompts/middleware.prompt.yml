@@ -10,7 +10,7 @@ messages:
     content: |
       Write an EnsureUserIsSubscribed middleware. If user is not subscribed, return 403 JSON response.
       Otherwise call $next($request). Clear descriptive name. No business logic inside.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 384

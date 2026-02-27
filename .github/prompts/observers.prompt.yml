@@ -10,7 +10,7 @@ messages:
     content: |
       Write a UserObserver with created() that sends WelcomeNotification, and updated()/deleted() that clear cache.
       Use Observer suffix. Only define methods you need. No business logic.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 384

@@ -10,7 +10,7 @@ messages:
     content: |
       Write an anonymous Blade button component with @props for variant and size. Merge $attributes with defaults.
       Use min-h-[44px] for touch target, focus-visible:ring-2. Mobile-first.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

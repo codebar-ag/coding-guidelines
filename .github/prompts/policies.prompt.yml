@@ -10,7 +10,7 @@ messages:
     content: |
       Write an InvoicePolicy with viewAny (admin only), view (owner or admin), create (authenticated).
       Use Policy suffix. Standard ability names.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

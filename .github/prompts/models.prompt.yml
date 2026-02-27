@@ -10,7 +10,7 @@ messages:
     content: |
       Write a minimal Invoice Eloquent model with guarded, casts as method, and a belongsTo Order relationship.
       Use typed return type on the relationship. Include section comment headers.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

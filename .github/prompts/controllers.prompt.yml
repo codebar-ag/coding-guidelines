@@ -10,7 +10,7 @@ messages:
     content: |
       Write an invokable StoreInvoiceController that receives StoreInvoiceRequest, calls a CreateInvoice action,
       and returns a JsonResponse with InvoiceResource. No business logic in the controller.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

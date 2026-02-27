@@ -10,7 +10,7 @@ messages:
     content: |
       Write a StoreInvoiceRequest with authorize() using can('create', Invoice::class) and rules() with array-based definitions.
       Add PHPDoc @return for rules(). Never use $request->validate() in controller.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

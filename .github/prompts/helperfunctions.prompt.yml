@@ -10,7 +10,7 @@ messages:
     content: |
       Write PHP code to filter an array of users to only active ones, then get their email addresses as a comma-separated string.
       Use Laravel Arr and Str helpers instead of native PHP functions.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512

@@ -10,7 +10,7 @@ messages:
     content: |
       Write a process(Order $order) method with early returns. If !$order->isPaid() throw exception and return.
       If !$order->hasItems() throw and return. Then happy-path logic. No else/elseif. Use guard clauses.
-model: openai/gpt-4o
+model: openai/gpt-4o-mini
 modelParameters:
   temperature: 0.2
   maxCompletionTokens: 512
