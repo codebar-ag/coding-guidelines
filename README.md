@@ -1,19 +1,33 @@
 # Coding Guidelines
 
-Shared Cursor AI rules and skills for codebar-ag Laravel projects. The AI uses these to follow consistent conventions for PHP, Laravel, testing, frontend, and services.
+Shared Laravel AI coding guidelines and skills for codebar-ag projects. A Boost-first Composer package that ships 30+ skills for consistent conventions across PHP, Laravel, testing, frontend, and services.
 
 **Rule index:** See [RULES.md](RULES.md) for the full rule structure and file reference.
 
 ---
 
-## Prerequisites
+## Skills Summary
 
-- A Laravel project where you want to use these guidelines
-- [Laravel Boost](https://github.com/laravel/boost) (for syncing rules/skills into your project)
+| Category | Skills | Description |
+|----------|--------|-------------|
+| **Laravel** | General, HelperFunctions, Models, Controllers, Migrations, Routing, FormRequests | Framework conventions, config/logging, Eloquent, routes, validation |
+| **Backend** | Actions, Commands, DTO, Enums, Events, Exceptions, Helpers, Interfaces, Jobs, Middleware, Observers, Policies, Requests, Resources, Services, Traits | PHP architecture, single-purpose classes, API resources, queue jobs |
+| **Frontend** | Blade, Livewire | Templates, components, reactive UI |
+| **Testing** | PHPUnit, PestTesting, PHPStan, Dusk | Unit/feature tests, static analysis, browser tests |
+| **Services** | Saloon | External API integrations (Saloon pattern) |
+
+**Total: 30 skills.** Each skill includes Rules, Examples, Anti-Patterns, and References.
 
 ---
 
-## 1. Install Laravel Boost (if not already)
+## Implementation Guide
+
+### Prerequisites
+
+- A Laravel project where you want to use these guidelines
+- [Laravel Boost](https://github.com/laravel/boost) (required for skill discovery)
+
+### Step 1: Install Laravel Boost
 
 In your Laravel project:
 
@@ -22,34 +36,70 @@ composer require laravel/boost --dev
 php artisan boost:install
 ```
 
----
+### Step 2: Add this package
 
-## 2. Activate the MCP server
+**Option A — Composer (recommended for version pinning):**
 
-If your editor supports MCP (Model Context Protocol), configure it to use the Boost MCP server so the AI has full context. See the [Laravel Boost documentation](https://github.com/laravel/boost) for your editor’s setup.
+```bash
+composer require codebar-ag/coding-guidelines --dev
+```
 
----
-
-## 3. Add and sync the guidelines
-
-Choose one of the following depending on how you work with this repo.
-
-### When you are **not** pulling from `main`
-
-1. Copy the **`skills`** folder from this repo into your AI config folder (e.g. `.cursor/skills` or your editor’s equivalent).
-2. In your Laravel project, run:
-
-   ```bash
-   php artisan boost:update
-   ```
-
-### When you **are** pulling from the `main` branch (recommended)
-
-In your Laravel project, add this repo as a Boost skill source and update:
+**Option B — GitHub via Boost:**
 
 ```bash
 php artisan boost:add-skill codebar-ag/coding-guidelines
+```
+
+### Step 3: Sync skills
+
+```bash
 php artisan boost:update
 ```
 
-After this, the AI in your project will automatically use the rules and skills from this repository.
+Boost automatically discovers skills from `vendor/codebar-ag/coding-guidelines/resources/boost/skills/` when the package is installed.
+
+### Step 4: Activate MCP (optional)
+
+If your editor supports MCP (Model Context Protocol), configure it to use the Boost MCP server for full context. See the [Laravel Boost documentation](https://laravel.com/docs/boost) for your editor’s setup.
+
+### Step 5: Override skills locally (optional)
+
+To customize a skill for your project, create a file at `.ai/skills/{skill-name}/SKILL.md`. Your local version takes precedence over the package default.
+
+Example: override the Models skill:
+
+```
+your-project/
+├── .ai/
+│   └── skills/
+│       └── models/
+│           └── SKILL.md    ← Your custom version
+```
+
+---
+
+## How It Works
+
+This package places skills in `resources/boost/skills/{skill-name}/SKILL.md`. Laravel Boost v2.2+ automatically discovers skills from vendor packages when you run `boost:update`. No custom sync commands — Boost handles everything.
+
+| Source | Path |
+|--------|------|
+| This package | `vendor/codebar-ag/coding-guidelines/resources/boost/skills/` |
+| Project overrides | `.ai/skills/{skill-name}/SKILL.md` |
+
+---
+
+## Updating
+
+When using Composer:
+
+```bash
+composer update codebar-ag/coding-guidelines
+php artisan boost:update
+```
+
+When using `boost:add-skill`:
+
+```bash
+php artisan boost:update
+```
