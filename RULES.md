@@ -23,6 +23,8 @@ Rules for test frameworks and static analysis tools.
 |------|-------|-------------|
 | `phpunit.mdc` | `tests/**/*.php` | PHPUnit test structure, naming, assertions, and factory conventions |
 | `phpstan.mdc` | Always | PHPStan Level 9 static analysis compliance |
+| `pest-testing.mdc` | Laravel Testing Framework Pest 4 |
+
 
 ### frontend/
 
@@ -42,10 +44,23 @@ Rules for general PHP backend conventions (not Laravel-specific).
 
 | File | Scope | Description |
 |------|-------|-------------|
-| `php.mdc` | `app/**/*.php` | General PHP conventions -- strict typing, formatting, language |
-| `enums.mdc` | `app/Enums/**/*.php` | PHP backed enum conventions with label and color helpers |
+| `actions.mdc` | `app/Actions/**/*.php` | Action conventions — single-purpose business logic classes |
+| `commands.mdc` | `app/Console/Commands/**/*.php` | Command conventions — command classes, how to use them, and what belongs in them |
 | `dto.mdc` | `**/DataObjects/**/*.php` | Readonly Data Transfer Object conventions with fromArray factory |
+| `enums.mdc` | `app/Enums/**/*.php` | PHP backed enum conventions with label and color helpers |
+| `events-listeners.mdc` | `app/Events/**/*.php,app/Listeners/**/*.php` | Event & Listener conventions — decoupled communication between application layers |
+| `exceptions.mdc` | `app/Exceptions/**/*.php` | Exception conventions — custom exceptions for domain and application errors |
+| `helpers.mdc` | `app/Helpers/**/*.php` | Helper conventions — helper classes how to use and what belongs into it |
+| `interfaces-contracts.mdc` | `app/Contracts/**/*.php` | Interface & Contract conventions — defining contracts between components |
 | `jobs.mdc` | `app/Jobs/**/*.php` | Queued job conventions with retries, backoff, and structured logging |
+| `middleware.mdc` | `app/Http/Middleware/**/*.php` | Middleware conventions — HTTP request and response pipeline |
+| `observers.mdc` | `app/Observers/**/*.php` | Observer conventions — reacting to Eloquent model lifecycle events |
+| `php.mdc` | `app/**/*.php` | General PHP conventions -- strict typing, formatting, language |
+| `policies.mdc` | `app/Policies/**/*.php` | Policy conventions — authorization logic for models and resources |
+| `requests.mdc` | `app/Http/Requests/**/*.php` | Form Request validation conventions |
+| `resources.mdc` | `app/Http/Resources/**/*.php` | Resource conventions — API resources, collections, and response shaping |
+| `services.mdc` | `app/Services/**/*.php` | Service conventions — complex orchestration across multiple domains |
+| `traits.mdc` | `app/Traits/**/*.php` | Trait conventions — when to use traits, how to write them, and what belongs in them |
 
 ### laravel/
 
@@ -54,6 +69,7 @@ Rules for Laravel framework conventions.
 | File | Scope | Description |
 |------|-------|-------------|
 | `general.mdc` | Always | Project-wide Laravel conventions that always apply |
+| `laravel-helperfunctions.mdc` | Always | Laravel Helper Functions – Always use Arr::, Str:: and Collection methods instead of native PHP equivalents |
 | `models.mdc` | `app/Models/**/*.php` | Eloquent model conventions -- guarded, casts, sections, activity log |
 | `controllers.mdc` | `app/Http/Controllers/**/*.php` | Controller conventions -- thin controllers, invokable, service delegation |
 | `migrations.mdc` | `database/migrations/**/*.php` | Database migration conventions -- always new files, naming, structure |
