@@ -13,7 +13,7 @@ Shared Cursor AI rules and skills for codebar-ag Laravel projects. The AI uses t
 
 ---
 
-## 1. Install Laravel Boost
+## 1. Install Laravel Boost (if not already)
 
 In your Laravel project:
 
@@ -24,7 +24,7 @@ php artisan boost:install
 
 ---
 
-## 2. Activate the MCP server (optional)
+## 2. Activate the MCP server
 
 If your editor supports MCP (Model Context Protocol), configure it to use the Boost MCP server so the AI has full context. See the [Laravel Boost documentation](https://github.com/laravel/boost) for your editor’s setup.
 
