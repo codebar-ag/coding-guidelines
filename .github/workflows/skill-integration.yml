@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 5
       matrix:
         skill:
           - general
@@ -72,6 +73,7 @@ jobs:
         with:
           token: ${{ secrets.MY_GITHUB_TOKEN }}
           endpoint: https://models.github.ai/orgs/${{ github.repository_owner }}/inference
+          model: openai/gpt-4o-mini
           prompt-file: .github/prompts/${{ matrix.skill }}.prompt.yml
           file_input: |
             skill_content: /tmp/skill-content.txt
