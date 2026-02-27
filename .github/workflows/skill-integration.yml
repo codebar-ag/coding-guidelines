@@ -70,6 +70,8 @@ jobs:
         id: infer
         uses: actions/ai-inference@v2
         with:
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          endpoint: https://models.github.ai/orgs/${{ github.repository_owner }}/inference
           prompt-file: .github/prompts/${{ matrix.skill }}.prompt.yml
           file_input: |
             skill_content: /tmp/skill-content.txt
