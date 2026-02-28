@@ -1,6 +1,8 @@
 # Dependencies
 vendor/*
 vendor/
+guidelines/
+
 node_modules/
 
 # Composer

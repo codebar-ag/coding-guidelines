@@ -21,7 +21,7 @@ description: Saloon-based service layer pattern for all external API integration
 - The service class wraps the connector, sends requests, and returns typed DTOs
 - Register the connector as a singleton in a service provider when needed
 - Accept an optional connector in the service constructor for testability
-- Exceptions: **Prism** is acceptable for AI/LLM integrations; inline `Http::get()` is acceptable for simple binary file downloads (not API integrations)
+- Exceptions: **Prism** is acceptable for LLM integrations; inline `Http::get()` is acceptable for simple binary file downloads (not API integrations)
 
 ## Examples
 

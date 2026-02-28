@@ -1,10 +1,9 @@
 {
     "name": "codebar-ag/coding-guidelines",
-    "description": "Shared Laravel AI coding guidelines and skills for codebar-ag projects. Boost-first Composer package.",
+    "description": "Shared Laravel coding guidelines and skills for codebar-ag projects. Composer package for Laravel Boost.",
     "keywords": [
         "laravel",
         "boost",
-        "ai",
         "cursor",
         "coding-guidelines",
         "skills"
@@ -35,7 +34,8 @@
         }
     },
     "scripts": {
-        "validate-skills": "php scripts/validate-skills.php"
+        "validate-skills": "php scripts/validate-skills.php",
+        "sync-guidelines": "php scripts/sync-guidelines.php"
     },
     "config": {
         "sort-packages": true
