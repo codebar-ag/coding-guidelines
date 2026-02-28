@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Add a Stripe API key to the Laravel config and show how to read it in a controller.
+      Use the correct helper for config access. Show the config file addition and one line of controller code.
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

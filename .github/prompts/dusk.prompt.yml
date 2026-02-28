@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a Dusk test that logs in, visits /invoices/create, uses dusk="" selectors, calls assertNoJavaScriptErrors().
+      Use DatabaseTruncation. Use loginAs(), waitForText, never pause().
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

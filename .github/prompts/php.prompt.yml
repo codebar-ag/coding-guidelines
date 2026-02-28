@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a process(Order $order) method with early returns. If !$order->isPaid() throw exception and return.
+      If !$order->hasItems() throw and return. Then happy-path logic. No else/elseif. Use guard clauses.
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

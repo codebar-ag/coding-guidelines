@@ -1,0 +1,45 @@
+{
+    "name": "codebar-ag/coding-guidelines",
+    "description": "Shared Laravel AI coding guidelines and skills for codebar-ag projects. Boost-first Composer package.",
+    "keywords": [
+        "laravel",
+        "boost",
+        "ai",
+        "cursor",
+        "coding-guidelines",
+        "skills"
+    ],
+    "license": "MIT",
+    "require": {
+        "illuminate/support": "^12.0",
+        "php": "^8.4"
+    },
+    "suggest": {
+        "laravel/boost": "Required for skill discovery. Install in your Laravel project."
+    },
+    "autoload": {
+        "psr-4": {
+            "CodebarAg\\CodingGuidelines\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CodebarAg\\CodingGuidelines\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CodebarAg\\CodingGuidelines\\CodingGuidelinesServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "validate-skills": "php scripts/validate-skills.php"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

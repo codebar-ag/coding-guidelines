@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write an invokable StoreInvoiceController that receives StoreInvoiceRequest, calls a CreateInvoice action,
+      and returns a JsonResponse with InvoiceResource. No business logic in the controller.
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

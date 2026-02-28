@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write lang/en/invoices.php with create_success key using :name placeholder.
+      Show usage with __('invoices.create_success', ['name' => $name]). Use namespaced keys.
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 384

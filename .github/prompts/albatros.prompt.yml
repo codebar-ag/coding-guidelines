@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write an AlbatrosConnector extending Saloon Connector. Use config('albatros.base_url'), Mandant header, Bearer token.
+      Use Cache for reference data. German domain terms in DTOs are acceptable.
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

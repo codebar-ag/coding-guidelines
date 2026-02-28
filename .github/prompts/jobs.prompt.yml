@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a ProcessInvoicePaymentJob that implements ShouldQueue. Delegate to ProcessInvoicePayment action.
+      Use Dispatchable, InteractsWithQueue, Queueable, SerializesModels. Set tries, backoff, queue. Add failed() method.
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512

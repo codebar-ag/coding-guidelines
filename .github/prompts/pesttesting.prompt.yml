@@ -1,0 +1,16 @@
+messages:
+  - role: system
+    content: |
+      You are a Laravel developer. Apply these guidelines exactly:
+
+      {{skill_content}}
+
+      Respond with only the requested code. No explanations unless asked.
+  - role: user
+    content: |
+      Write a Pest test it('creates an invoice for the given order') with AAA pattern and Arrange/Act/Assert comments.
+      Use uses(RefreshDatabase::class), postJson, assertCreated(), expect()->toBe(). Plain English description.
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  maxCompletionTokens: 512
