@@ -56,7 +56,19 @@ Boost automatically discovers skills from `vendor/codebar-ag/coding-guidelines/r
 
 If your editor supports MCP (Model Context Protocol), configure it to use the Boost MCP server for full context. See the [Laravel Boost documentation](https://laravel.com/docs/boost) for your editor's setup.
 
-### Step 5: Override skills locally (optional)
+### Step 5: Refactor command (Cursor)
+
+To run a full codebase refactor against all guidelines:
+
+1. Ensure `.cursor/commands/` exists in your project
+2. Copy the refactor prompt:
+   - From package: `cp vendor/codebar-ag/coding-guidelines/refactor.md .cursor/commands/refactor.md`
+   - Or from guidelines (if synced): `cp guidelines/refactor.md .cursor/commands/refactor.md`
+3. In Cursor, type `/refactor` and run the command
+
+The prompt instructs the AI to discover all skills, map them to your codebase, analyze for violations, and refactor for full compliance. Use it when newly adopting guidelines or to cross-check AI implementations.
+
+### Step 6: Override skills locally (optional)
 
 To customize a skill for your project, create a file at `.ai/skills/{skill-name}/SKILL.md`. Your local version takes precedence over the package default.
 
@@ -80,7 +92,7 @@ To sync the complete guidelines repo (`.github/prompts`, `RULES.md`, etc.) into 
 }
 ```
 
-Then run `composer sync-guidelines`. This clones or pulls the repo into `guidelines/` at your project root.
+Then run `composer sync-guidelines`. This clones or pulls the repo into `guidelines/` at your project root and copies `refactor.md` to `.cursor/commands/refactor.md` for use with Cursor slash commands.
 
 ---
 

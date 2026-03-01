@@ -29,3 +29,17 @@ if ($exitCode !== 0) {
 }
 
 echo "Guidelines synced to {$targetDir}/.".PHP_EOL;
+
+// Copy refactor.md to .cursor/commands/ for Cursor slash commands
+$refactorSource = __DIR__.'/../refactor.md';
+$commandsDir = '.cursor/commands';
+$refactorDest = $commandsDir.'/refactor.md';
+
+if (file_exists($refactorSource)) {
+    if (! is_dir($commandsDir)) {
+        mkdir($commandsDir, 0755, true);
+    }
+    if (copy($refactorSource, $refactorDest)) {
+        echo "Refactor command copied to {$refactorDest}.".PHP_EOL;
+    }
+}
