@@ -12,30 +12,31 @@ declare(strict_types=1);
  *
  * Exits with code 1 if any skill is invalid.
  */
-
-$skillsDir = __DIR__ . '/../resources/boost/skills';
-if (!is_dir($skillsDir)) {
+$skillsDir = __DIR__.'/../resources/boost/skills';
+if (! is_dir($skillsDir)) {
     fwrite(STDERR, "Skills directory not found: {$skillsDir}\n");
     exit(1);
 }
 
-$skillDirs = glob($skillsDir . '/*', GLOB_ONLYDIR);
+$skillDirs = glob($skillsDir.'/*', GLOB_ONLYDIR);
 $errors = [];
 $expectedCount = 36;
 
 foreach ($skillDirs as $dir) {
-    $skillFile = $dir . '/SKILL.md';
+    $skillFile = $dir.'/SKILL.md';
     $skillName = basename($dir);
 
-    if (!file_exists($skillFile)) {
+    if (! file_exists($skillFile)) {
         $errors[] = "{$skillName}: Missing SKILL.md";
+
         continue;
     }
 
     $content = file_get_contents($skillFile);
 
-    if (!preg_match('/^---\s*\n(.*?)\n---\s*\n/s', $content, $matches)) {
+    if (! preg_match('/^---\s*\n(.*?)\n---\s*\n/s', $content, $matches)) {
         $errors[] = "{$skillName}: Missing or invalid YAML frontmatter (must start with --- and end with ---)";
+
         continue;
     }
 
@@ -56,7 +57,7 @@ foreach ($skillDirs as $dir) {
     }
 }
 
-if (!empty($errors)) {
+if (! empty($errors)) {
     foreach ($errors as $err) {
         fwrite(STDERR, "ERROR: {$err}\n");
     }

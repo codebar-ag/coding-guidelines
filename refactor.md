@@ -8,8 +8,11 @@ You are refactoring a Laravel codebase to achieve 100% alignment with **codebar-
 
 Locate skills from one of these paths (check in order; first existing wins):
 
+- `resources/boost/skills/` (when running inside this guidelines package repo)
 - `vendor/codebar-ag/coding-guidelines/resources/boost/skills/`
 - `guidelines/resources/boost/skills/`
+
+If none exist, search the workspace for `**/resources/boost/skills/*/SKILL.md` and use the nearest matching root as the active skill source path.
 
 Project overrides in `.ai/skills/{skill-name}/SKILL.md` take precedence over package defaults.
 
@@ -62,6 +65,15 @@ For each skill in order:
 ---
 
 ## 5. Output Format
+
+### Phase 0: Plan and Confirm (mandatory)
+
+Before making any code changes:
+
+- Enter planning mode and produce a concrete implementation plan.
+- Include: applicable skills, target files, prioritized violation groups, and intended edit batches.
+- Present the plan to the user and request explicit approval.
+- Do not edit files, run formatters, or execute write operations until the user confirms the plan.
 
 ### Phase A: Compliance Report (before edits)
 

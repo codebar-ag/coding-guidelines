@@ -1,5 +1,6 @@
 {
     "name": "codebar-ag/coding-guidelines",
+    "type": "composer-plugin",
     "description": "Shared Laravel coding guidelines and skills for codebar-ag projects. Composer package for Laravel Boost.",
     "keywords": [
         "laravel",
@@ -10,6 +11,8 @@
     ],
     "license": "MIT",
     "require": {
+        "composer-plugin-api": "^2.0",
+        "illuminate/console": "^12.0",
         "illuminate/support": "^12.0",
         "php": "^8.4"
     },
@@ -27,6 +30,7 @@
         }
     },
     "extra": {
+        "class": "CodebarAg\\CodingGuidelines\\Composer\\RefactorCommandPlugin",
         "laravel": {
             "providers": [
                 "CodebarAg\\CodingGuidelines\\CodingGuidelinesServiceProvider"
@@ -41,5 +45,8 @@
         "sort-packages": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "laravel/pint": "^1.27"
+    }
 }
