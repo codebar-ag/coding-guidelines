@@ -1,6 +1,11 @@
 ---
 name: albatros
 description: Albatros accounting API integration via Saloon. Use when working with app/Services/Albatros/, AlbatrosConnector, or Albatros DTOs.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Albatros API Integration

@@ -1,6 +1,11 @@
 ---
 name: events
 description: Decoupled communication between application layers. Events are plain data objects describing what happened; listeners react to those events with a single, specific side effect.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Events & Listeners

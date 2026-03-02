@@ -1,6 +1,10 @@
 ---
 name: translations
 description: Translation and localization conventions for Laravel. Use when adding user-facing strings, creating translation files, or working with lang/ directory.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Translations

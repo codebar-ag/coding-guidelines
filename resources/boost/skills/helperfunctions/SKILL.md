@@ -1,6 +1,11 @@
 ---
 name: helperfunctions
 description: Always prefer Laravel's built-in helper classes over native PHP functions. Use `Arr::`, `Str::`, and Collection methods instead of native PHP equivalents.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Laravel Helper Functions

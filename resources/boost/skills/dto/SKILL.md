@@ -1,6 +1,11 @@
 ---
 name: dto
 description: Readonly data containers with a `fromArray` factory method used to pass structured data between application layers — especially for external API responses and service boundaries.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** DTO (Data Transfer Object)

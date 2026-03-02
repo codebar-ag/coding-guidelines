@@ -1,6 +1,10 @@
 ---
 name: phpunit
 description: PHPUnit test structure, naming, assertions, and factory conventions for Laravel feature and unit tests.
+compatible_agents:
+  - test
+  - refactor
+  - review
 ---
 
 **Name:** PHPUnit

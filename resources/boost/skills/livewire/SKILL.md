@@ -1,6 +1,10 @@
 ---
 name: livewire
 description: Laravel Livewire conventions for building interactive UI without custom JavaScript. Components are PHP classes with reactive properties, computed properties, and event dispatching.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Livewire Components

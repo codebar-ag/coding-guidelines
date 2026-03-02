@@ -1,6 +1,10 @@
 ---
 name: blade
 description: Laravel Blade template conventions covering components, output escaping, security, structure, and formatting.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Blade Templates

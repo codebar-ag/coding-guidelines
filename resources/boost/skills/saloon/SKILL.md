@@ -1,6 +1,11 @@
 ---
 name: saloon
 description: Saloon-based service layer pattern for all external API integrations. Every new external API integration must use Saloon — no raw HTTP calls.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Saloon API Integration

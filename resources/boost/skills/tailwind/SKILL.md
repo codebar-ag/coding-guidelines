@@ -1,6 +1,10 @@
 ---
 name: tailwind
 description: Tailwind CSS v4 styling conventions. Use when working with CSS, Tailwind utilities, or customizing the theme in Laravel projects.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Tailwind CSS

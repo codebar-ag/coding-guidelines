@@ -1,6 +1,11 @@
 ---
 name: jobs
 description: Queueable units of work for background processing. Jobs handle queue configuration and failure handling — they delegate business logic to Actions or Services.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Jobs

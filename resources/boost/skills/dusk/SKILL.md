@@ -1,6 +1,10 @@
 ---
 name: dusk
 description: End-to-end browser testing with Laravel Dusk. Used exclusively for full user flows requiring a real Chrome browser — JavaScript interactions, multi-step forms, and visual assertions.
+compatible_agents:
+  - test
+  - refactor
+  - review
 ---
 
 **Name:** Dusk (Browser Testing)

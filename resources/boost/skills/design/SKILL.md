@@ -1,6 +1,10 @@
 ---
 name: design
 description: Component-first design system for Blade views. Use when creating UI components, designing responsive layouts, or implementing accessible interfaces.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Design System

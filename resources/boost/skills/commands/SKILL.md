@@ -1,6 +1,11 @@
 ---
 name: commands
 description: Artisan console command classes that serve as the CLI entry point for operations. Commands validate input and delegate all business logic to Actions or Services.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Commands

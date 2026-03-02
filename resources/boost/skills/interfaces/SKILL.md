@@ -1,6 +1,11 @@
 ---
 name: interfaces
 description: Contracts defining the shape a class must conform to. Used for decoupling dependent classes from concrete implementations, enabling multiple implementations and easier testing.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Interfaces & Contracts

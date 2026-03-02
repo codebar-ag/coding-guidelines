@@ -1,6 +1,11 @@
 ---
 name: helpers
 description: Stateless utility classes providing shared formatting, conversion, or calculation logic needed across multiple parts of the application.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Helpers

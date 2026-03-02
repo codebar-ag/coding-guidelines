@@ -1,6 +1,10 @@
 ---
 name: resources
 description: API resource classes that transform Eloquent models into JSON-ready arrays. Resources control exactly what is exposed in API responses and handle relationships, conditional attributes, and date formatting.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Resources

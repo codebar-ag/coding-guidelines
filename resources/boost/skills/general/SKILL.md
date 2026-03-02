@@ -1,6 +1,11 @@
 ---
 name: general
 description: Project-wide Laravel conventions that always apply: configuration access, database patterns, logging, activity logging, and code formatting.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Laravel General Conventions
@@ -73,3 +78,7 @@ activity()
 - [Laravel Logging](https://laravel.com/docs/logging)
 - [Spatie Activity Log](https://spatie.be/docs/laravel-activitylog/)
 - [Laravel Pint](https://laravel.com/docs/pint)
+
+## Further reading
+
+For the skill authoring template and workflow structure, see [docs/skills/template-skill.md](../../../../docs/skills/template-skill.md).

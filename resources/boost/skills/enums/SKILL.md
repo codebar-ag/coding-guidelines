@@ -1,6 +1,11 @@
 ---
 name: enums
 description: PHP backed string enums used instead of constants or magic strings. Enums include `label()` and `color()` helper methods and are cast on Eloquent models.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Enums

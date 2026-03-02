@@ -1,6 +1,10 @@
 ---
 name: pesttesting
 description: Laravel testing conventions using the Pest PHP framework. Covers test structure, AAA pattern, HTTP assertions, datasets, mocking, browser tests, and architecture tests.
+compatible_agents:
+  - test
+  - refactor
+  - review
 ---
 
 **Name:** Pest Testing

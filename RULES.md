@@ -2,6 +2,8 @@
 
 This file defines the folder structure and conventions for skills in this package.
 
+It serves as the index of coding-guideline skills for Laravel Boost and other AI assistants. Detailed rules live in the individual `SKILL.md` files, while `README.md` explains installation, high-level usage, and the full skill list.
+
 ## Package Layout
 
 Skills live in `resources/boost/skills/{skill-name}/SKILL.md` — the path Laravel Boost discovers for vendor packages.
@@ -53,3 +55,8 @@ description: Brief description of when to use this skill
 ## Overriding Skills
 
 Projects can override any skill by creating `.ai/skills/{skill-name}/SKILL.md` in their Laravel project. The local file takes precedence over the package default.
+
+Use this package’s `resources/boost/skills/{skill-name}/SKILL.md` files as **defaults to read**, not files to edit in `vendor/`. For project-specific conventions:
+
+- Prefer `.ai/skills/{skill-name}/SKILL.md` in your application.
+- Adjust the `compatible_agents` frontmatter there to map skills to the agents from `AGENTS.md` (ArchitectAgent, ImplementationAgent, RefactorAgent, TestAgent, ReviewAgent).

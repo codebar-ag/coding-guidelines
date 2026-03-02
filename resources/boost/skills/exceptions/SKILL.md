@@ -1,6 +1,11 @@
 ---
 name: exceptions
 description: Named, meaningful failure states in your domain. Custom exceptions communicate precise failure reasons to callers and optionally carry domain-specific data.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Exceptions

@@ -1,6 +1,11 @@
 ---
 name: docuware
 description: DocuWare document management integration patterns. Use when working with DocuWare connector, webhooks, document imports, or app/Services/DocuWare/.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** DocuWare Integration

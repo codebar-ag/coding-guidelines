@@ -1,6 +1,11 @@
 ---
 name: observers
 description: Centralised classes that react to Eloquent model lifecycle events. Used for side effects that should always fire regardless of where a model is mutated — such as notifications, cache invalidation, and audit logging.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Observers

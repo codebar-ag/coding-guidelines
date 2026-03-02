@@ -1,6 +1,10 @@
 ---
 name: requests
 description: Dedicated Form Request validation classes for all controller input. Every endpoint that accepts user input must use a `FormRequest` class — validation never happens directly inside a controller.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Form Request Validation

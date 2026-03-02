@@ -1,6 +1,11 @@
 ---
 name: traits
 description: Reusable behaviour shared across multiple unrelated classes. Traits provide shared Eloquent scopes, accessors, lifecycle hooks, and small stateless helper methods.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Traits

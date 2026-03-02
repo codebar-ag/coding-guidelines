@@ -25,3 +25,7 @@ Thumbs.db
 .php-cs-fixer.cache
 coverage/
 .phpunit.cache/
+
+phpunit.xml
+
+.cursor/

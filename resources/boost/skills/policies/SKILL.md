@@ -1,6 +1,11 @@
 ---
 name: policies
 description: Centralised authorization logic for a given Eloquent model. Policies define per-ability access control and are enforced at the controller level.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Policies

@@ -1,6 +1,10 @@
 ---
 name: middleware
 description: HTTP request/response pipeline handlers that inspect, modify, or reject requests before or after they reach a controller. Used for authentication, throttling, header manipulation, and logging.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Middleware

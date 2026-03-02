@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    colors="true"
+    bootstrap="vendor/autoload.php"
+>
+    <php>
+        <!-- ANTHROPIC_API_KEY is intentionally empty here.
+             Override it via your shell environment or a local phpunit.xml (gitignored). -->
+        <env name="ANTHROPIC_API_KEY" value="" />
+        <env name="ANTHROPIC_MODEL" value="claude-3-5-sonnet@20240620" />
+    </php>
+
+    <testsuites>
+        <testsuite name="skills">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
+

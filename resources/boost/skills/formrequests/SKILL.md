@@ -1,6 +1,10 @@
 ---
 name: formrequests
 description: Dedicated validation classes for all controller input. Form Requests encapsulate validation rules, authorization, and error messages outside of controllers.
+compatible_agents:
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Form Requests

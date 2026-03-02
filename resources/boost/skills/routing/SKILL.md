@@ -1,6 +1,11 @@
 ---
 name: routing
 description: Route file conventions for organising API and web routes. Covers file separation, naming, grouping, middleware, and route model binding.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Routing

@@ -1,6 +1,11 @@
 ---
 name: migrations
 description: Database schema change files. Always create new files for changes — never modify existing migrations. Use descriptive names, proper foreign key constraints, and reversible `down()` methods.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** Migrations

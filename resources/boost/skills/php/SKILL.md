@@ -1,6 +1,11 @@
 ---
 name: php
 description: General PHP coding standards covering strict typing, formatting, control flow, and error handling. Applies to all PHP files in the application.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 **Name:** PHP Conventions
