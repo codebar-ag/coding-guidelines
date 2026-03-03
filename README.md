@@ -274,3 +274,11 @@ This package validates its own skills using Pest and the [Laravel AI SDK](https:
 - **PHPUnit config**: `phpunit.xml.dist` is committed; copy to `phpunit.xml` (gitignored) for local overrides.
 
 The `.github/workflows/skills-validation.yml` workflow runs these checks on pushes and pull requests. Configure `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` as GitHub secrets.
+
+Under the hood, skills validation is performed by a small Laravel AI agent and a queued job:
+
+- **Dispatch**: a `skills:validate` console command discovers each `resources/boost/skills/**/SKILL.md` file and dispatches a validation job per file.
+- **Execution**: each job calls the Laravel AI agent once, then appends a JSON line with the input markdown, structured output, and any provider usage metadata to `storage/logs/skills-validation.log`.
+- **Provider overloads**: if the Anthropic provider is temporarily overloaded, the job records an `overloaded` status for that skill instead of failing the whole test run.
+
+To keep CI stable, the Pest feature test for skills only asserts **that the correct jobs are dispatched**; the actual AI calls and token usage reporting happen inside the queued jobs.

@@ -29,3 +29,5 @@ coverage/
 phpunit.xml
 
 .cursor/
+
+storage/logs/*
