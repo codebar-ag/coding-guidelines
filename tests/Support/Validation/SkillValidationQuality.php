@@ -7,20 +7,20 @@ namespace CodebarAg\CodingGuidelines\Tests\Support\Validation;
 final class SkillValidationQuality
 {
     /**
-     * @param  array{warnings: array<int, string>, improvements: array<int, string>}  $result
+     * @param  array{warnings?: mixed, improvements?: mixed}  $result
      * @return array{issues: array<int, string>, score: int}
      */
     public static function evaluate(array $result): array
     {
         $issues = [];
-        $warnings = array_values(array_filter($result['warnings'] ?? [], 'is_string'));
-        $improvements = array_values(array_filter($result['improvements'] ?? [], 'is_string'));
+        $warnings = self::normalizeStringList($result['warnings'] ?? []);
+        $improvements = self::normalizeStringList($result['improvements'] ?? []);
 
-        if (count($warnings) > 6) {
+        if (count($warnings) > 5) {
             $issues[] = 'warnings_exceed_limit';
         }
 
-        if (count($improvements) > 6) {
+        if (count($improvements) > 5) {
             $issues[] = 'improvements_exceed_limit';
         }
 
@@ -143,5 +143,36 @@ final class SkillValidationQuality
         $normalized = preg_replace('/\s+/', ' ', $normalized) ?? '';
 
         return trim($normalized, " \t\n\r\0\x0B.,;:!?");
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function normalizeStringList(mixed $value): array
+    {
+        if (is_string($value)) {
+            $value = [$value];
+        }
+
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($value as $item) {
+            if (! is_string($item)) {
+                continue;
+            }
+
+            $item = trim($item);
+            if ($item === '') {
+                continue;
+            }
+
+            $normalized[] = $item;
+        }
+
+        return array_values($normalized);
     }
 }

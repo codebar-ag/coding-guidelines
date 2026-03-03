@@ -117,9 +117,9 @@ PROMPT,
             'skill_name' => data_get($response, 'skill_name'),
             'path' => data_get($response, 'path'),
             'valid' => (bool) data_get($response, 'valid', false),
-            'errors' => data_get($response, 'errors', []),
-            'warnings' => data_get($response, 'warnings', []),
-            'improvements' => data_get($response, 'improvements', []),
+            'errors' => self::normalizeStringList(data_get($response, 'errors', [])),
+            'warnings' => self::normalizeStringList(data_get($response, 'warnings', [])),
+            'improvements' => self::normalizeStringList(data_get($response, 'improvements', [])),
             'usage' => data_get($response, 'usage'),
         ];
 
@@ -156,5 +156,36 @@ PROMPT,
             json_encode($logEntry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).PHP_EOL,
             FILE_APPEND
         );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function normalizeStringList(mixed $value): array
+    {
+        if (is_string($value)) {
+            $value = [$value];
+        }
+
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($value as $item) {
+            if (! is_string($item)) {
+                continue;
+            }
+
+            $item = trim($item);
+            if ($item === '') {
+                continue;
+            }
+
+            $normalized[] = $item;
+        }
+
+        return array_values($normalized);
     }
 }

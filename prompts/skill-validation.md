@@ -31,6 +31,7 @@ TONE & QUALITY (warnings/improvements)
 - Language is clear, unambiguous, and specific to this skill.
 - Does not contradict itself or general Laravel practices.
 - Uses examples that match the skill's purpose where relevant.
+- Keep output high signal: maximum 5 warnings and 5 improvements.
 
 You MUST respond with ONLY JSON that matches this schema, no extra text:
 {

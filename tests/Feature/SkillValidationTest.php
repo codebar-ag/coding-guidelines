@@ -125,13 +125,40 @@ PROMPT,
         $this->fail('Skill validation response was null after retries.');
     }
 
+    $normalizeStringList = static function (mixed $value): array {
+        if (is_string($value)) {
+            $value = [$value];
+        }
+
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($value as $item) {
+            if (! is_string($item)) {
+                continue;
+            }
+
+            $item = trim($item);
+            if ($item === '') {
+                continue;
+            }
+
+            $normalized[] = $item;
+        }
+
+        return array_values($normalized);
+    };
+
     $responseData = [
         'skill_name' => data_get($response, 'skill_name'),
         'path' => data_get($response, 'path'),
         'valid' => (bool) data_get($response, 'valid', false),
-        'errors' => data_get($response, 'errors', []),
-        'warnings' => data_get($response, 'warnings', []),
-        'improvements' => data_get($response, 'improvements', []),
+        'errors' => $normalizeStringList(data_get($response, 'errors', [])),
+        'warnings' => $normalizeStringList(data_get($response, 'warnings', [])),
+        'improvements' => $normalizeStringList(data_get($response, 'improvements', [])),
         'usage' => data_get($response, 'usage'),
     ];
     $result = [
