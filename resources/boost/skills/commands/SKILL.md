@@ -1,25 +1,49 @@
 ---
 name: commands
 description: Artisan console command classes that serve as the CLI entry point for operations. Commands validate input and delegate all business logic to Actions or Services.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
-**Name:** Commands
-**Description:** Artisan console command classes that serve as the CLI entry point for operations. Commands validate input and delegate all business logic to Actions or Services.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Console/Commands/**/*.php, laravel, php, backend, artisan, cli, console
+# Commands
+
+## When to Use
+
+- CLI-triggered business operations, maintenance tasks, imports, and admin workflows.
+- Developer/operator entrypoints that should be explicit and scriptable.
+- Cases where command execution delegates domain behavior to Actions/Services.
+
+## When Not to Use
+
+- Pure background workflows that should be queued jobs directly.
+- Time-based automation that belongs in the scheduler (`app/Console/Kernel.php`) calling existing commands/jobs.
+- HTTP-initiated behavior where a controller/action is the correct entrypoint.
+
+## Preconditions
+
+- Command class is placed under `app/Console/Commands/`.
+- Required Action/Service dependencies already exist (or are planned first).
+- Signature, argument descriptions, and options are fully defined before implementation.
+- Input validation rules are known for all arguments/options.
+
+## Process Checklist
+
+- [ ] Define a clear `namespace:action` signature and command description.
+- [ ] Add descriptions for every argument/option.
+- [ ] Validate raw input with `validator()` or `Validator`.
+- [ ] Delegate business logic to an Action/Service.
+- [ ] Return `self::SUCCESS` / `self::FAILURE` consistently.
+- [ ] Add tests for success and failure paths.
 
 ## Rules
 
-- Command classes live in `app/Console/Commands/`
-- Each command should have a single, clearly defined responsibility
-- Complex logic belongs in **Actions** or **Services**, not in the command itself — commands are the entry point only
-- Use descriptive verb-noun names: `SendInvoiceReminders`, `ImportProductCsv`, `PruneExpiredSessions`
-- Command signatures follow the `namespace:action` pattern: `invoices:send-reminders`, `products:import`
-- Every argument and option **must** have a clear description
-- Validate all input using the `Validator` class — never trust raw input
-- Use `--option` flags for optional behaviour; avoid positional ambiguity
-- Implement `PromptsForMissingInput` so users receive clear prompts instead of silent failures
-- Commands must **always** return either `self::SUCCESS` or `self::FAILURE` — never `void` or `null`
+- Keep commands as orchestration entrypoints, not business-logic containers.
+- Validate all input and fail explicitly on invalid arguments/options.
+- Use `PromptsForMissingInput` for better operator UX.
+- Log meaningful errors while still returning deterministic exit codes.
 
 ## Examples
 
@@ -32,6 +56,7 @@ class SendInvoiceReminders extends Command implements PromptsForMissingInput
 
     protected $description = 'Send invoice payment reminders to a specific user.';
 
+    // Laravel resolves this dependency automatically via container injection.
     public function __construct(private readonly SendInvoiceReminderAction $action)
     {
         parent::__construct();
@@ -48,7 +73,7 @@ class SendInvoiceReminders extends Command implements PromptsForMissingInput
                 'email'   => ['required', 'email'],
                 'dry_run' => ['boolean'],
             ]
-        )->validate();
+        )->validate(); // Equivalent explicit style: Validator::make(...)->validate()
 
         try {
             $this->action->execute($validated['email']);
@@ -56,12 +81,41 @@ class SendInvoiceReminders extends Command implements PromptsForMissingInput
 
             return self::SUCCESS;
         } catch (Throwable $e) {
+            report($e);
             $this->error("Failed: {$e->getMessage()}");
 
             return self::FAILURE;
         }
     }
+
+    protected function promptForMissingArgumentsUsing(): array
+    {
+        return [
+            'email' => ['What email should receive the reminder?'],
+        ];
+    }
 }
+```
+
+## Testing Guidance
+
+- Add command tests for argument validation and exit codes.
+- Verify delegated Action/Service is called with validated values.
+- Assert console output for both success and error paths.
+
+```php
+it('delegates validated input to the action', function () {
+    $action = Mockery::mock(SendInvoiceReminderAction::class);
+    $action->shouldReceive('execute')
+        ->once()
+        ->with('billing@example.com');
+
+    $this->app->instance(SendInvoiceReminderAction::class, $action);
+
+    $this->artisan('invoices:send-reminders billing@example.com')
+        ->expectsOutput('Reminder sent to billing@example.com.')
+        ->assertExitCode(Command::SUCCESS);
+});
 ```
 
 ## Anti-Patterns

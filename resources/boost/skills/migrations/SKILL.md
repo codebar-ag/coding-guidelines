@@ -1,23 +1,54 @@
 ---
 name: migrations
 description: Database schema change files. Always create new files for changes — never modify existing migrations. Use descriptive names, proper foreign key constraints, and reversible `down()` methods.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
-**Name:** Migrations
-**Description:** Database schema change files. Always create new files for changes — never modify existing migrations. Use descriptive names, proper foreign key constraints, and reversible `down()` methods.
-**Compatible Agents:** general-purpose, backend
-**Tags:** database/migrations/**/*.php, laravel, php, backend, database, migration, schema
+# Migrations
 
-## Rules
+## When to Apply
 
-- Always create **new** migration files for database changes — **never** modify existing migration files
-- Use descriptive names: `create_invoices_table`, `add_status_to_invoices_table`
-- Implement both `up()` and `down()` methods — `down()` must fully reverse `up()`
-- Group related columns logically: IDs first, then data, then timestamps
-- Use enum string values for status columns: `$table->string('status')->default('draft')`
-- Add indexes on columns used in WHERE clauses and foreign keys
-- Use `foreignId()->constrained()->cascadeOnDelete()` for foreign keys
-- Keep migrations focused — one concern per migration
+- Apply for schema changes: tables, columns, indexes, foreign keys, constraints.
+- Apply when rollout/rollback behavior must be explicit and versioned.
+- Do not use for long-running data backfills or one-off data repair scripts.
+- For zero-downtime rollout strategies, pair this skill with deployment/runbook guidance.
+
+## Preconditions
+
+- Database connection and target environment are known.
+- Migration file naming follows timestamp prefix ordering.
+- Risky operations (`dropColumn`, type changes, destructive renames) are reviewed with backup/rollback plan.
+
+## Process
+
+### 1. Create a New Migration File
+
+- Never edit previously committed migration files.
+- Use descriptive names, for example `add_status_to_invoices_table`.
+- Generate with Laravel command:
+  - `php artisan make:migration add_status_to_invoices_table --table=invoices`
+
+### 2. Implement `up()` with Focused Changes
+
+- Keep one concern per migration.
+- Add indexes for foreign keys and common filters.
+- Prefer string-backed status columns for enum-like states.
+
+### 3. Implement Safe `down()` Reversal
+
+- Reverse every structural change in `up()` where possible.
+- Document irreversible/data-loss risks in comments and PR notes.
+- Remember: dropping a column restores schema only; removed data is not recovered.
+
+### 4. Validate Migration Lifecycle
+
+- Run `php artisan migrate` and `php artisan migrate:rollback --step=1` locally.
+- Confirm table timestamps behavior explicitly when removing timestamps:
+  - `$table->dropTimestamps();` (drops `created_at` and `updated_at` together).
 
 ## Examples
 
@@ -61,17 +92,43 @@ public function down(): void
 }
 ```
 
+```php
+// Dropping timestamps explicitly (schema reversal only, not data recovery)
+public function up(): void
+{
+    Schema::table('invoices', function (Blueprint $table) {
+        $table->dropTimestamps();
+    });
+}
+
+public function down(): void
+{
+    Schema::table('invoices', function (Blueprint $table) {
+        $table->timestamps();
+    });
+}
+```
+
+## Checklists
+
+- [ ] Migration is new (no edits to existing historical migrations).
+- [ ] File name is descriptive and timestamp ordered.
+- [ ] `up()` and `down()` are implemented and tested locally.
+- [ ] Destructive operations include rollback and data-loss notes.
+- [ ] Indexes/foreign keys are added for query and integrity needs.
+
 ## Anti-Patterns
 
 - Modifying existing migration files instead of creating new ones
-- Using an integer default for status columns instead of a string enum value
 - Omitting the `down()` method or leaving it empty
 - Not adding indexes on foreign key columns and frequently queried columns
 - Creating a single migration that makes multiple unrelated schema changes
-- Using `$table->integer('status')` instead of `$table->string('status')->default('...')`
+- Using integer status defaults when domain status is a named state (`draft`, `paid`, `cancelled`)
+- Assuming `down()` can recover data that was dropped in `up()`
 
 ## References
 
 - [Laravel Migrations](https://laravel.com/docs/migrations)
-- Related: `Models/SKILL.md` — models reflect the schema defined in migrations
-- Related: `Enums/SKILL.md` — enum string values used as migration defaults
+- [Laravel Migration Events and Commands](https://laravel.com/docs/migrations#running-migrations)
+- `resources/boost/skills/models/SKILL.md` (schema-to-model alignment)
+- `resources/boost/skills/enums/SKILL.md` (status value conventions)

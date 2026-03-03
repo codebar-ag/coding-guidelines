@@ -1,25 +1,37 @@
 ---
 name: events
 description: Decoupled communication between application layers. Events are plain data objects describing what happened; listeners react to those events with a single, specific side effect.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
-**Name:** Events & Listeners
-**Description:** Decoupled communication between application layers. Events are plain data objects describing what happened; listeners react to those events with a single, specific side effect.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Events/**/*.php, app/Listeners/**/*.php, laravel, php, backend, event, listener, observer-pattern
+# Events & Listeners
+
+## When to Use
+
+- One completed business action should trigger multiple independent side effects.
+- You need decoupling between the producer and consumers of a domain event.
+- Listeners can run asynchronously without changing core business result.
+
+## When Not to Use
+
+- You only need one simple side effect; call the Action directly.
+- The side effect must happen synchronously before returning control.
+- Event chaining would obscure flow and make failures hard to reason about.
 
 ## Rules
 
-- Event classes live in `app/Events/`; listener classes live in `app/Listeners/`
-- Events are plain data containers — no logic inside events
-- Listeners handle one specific reaction each — never bundle multiple side effects
-- Events: past-tense noun phrase → `InvoicePaid`, `UserRegistered`, `OrderShipped`
-- Listeners: verb phrase describing the reaction → `SendInvoicePaidNotification`, `UpdateInventory`
-- Dispatch events from inside an **Action** after the operation completes — never from a controller or model directly
-- Register events and listeners in `EventServiceProvider`
-- Implement `ShouldQueue` on listeners for side effects that can be deferred
-- Define a `failed()` method on queued listeners
-- Use events when one action triggers multiple independent side effects
+- Event classes live in `app/Events/`; listener classes live in `app/Listeners/`.
+- Events are plain data containers; keep business logic out of events.
+- Name events in past tense: `InvoicePaid`, `UserRegistered`, `OrderShipped`.
+- Each listener handles one reaction only.
+- Name listeners by reaction intent: `SendInvoicePaidNotification`, `UpdateInventory`.
+- Dispatch events from an Action after successful operation.
+- Register listeners in `EventServiceProvider`.
+- Use `ShouldQueue` for deferrable listeners and provide `failed()` for critical paths.
 
 ## Examples
 
@@ -48,6 +60,7 @@ namespace App\Listeners;
 use App\Events\InvoicePaid;
 use App\Notifications\InvoicePaidNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class SendInvoicePaidNotification implements ShouldQueue
 {
@@ -58,19 +71,30 @@ class SendInvoicePaidNotification implements ShouldQueue
 
     public function failed(InvoicePaid $event, \Throwable $exception): void
     {
-        // Handle failure
+        Log::error('Invoice paid notification listener failed.', [
+            'invoice_id' => $event->invoice->id,
+            'message' => $exception->getMessage(),
+        ]);
     }
 }
 ```
 
 ```php
-// Dispatching — from inside an Action
+// Dispatching from an Action after successful state change
+namespace App\Actions;
+
+use App\Events\InvoicePaid;
+use App\Models\Invoice;
+use Illuminate\Support\Facades\DB;
+
 class MarkInvoiceAsPaid
 {
     public function execute(Invoice $invoice): void
     {
-        $invoice->update(['paid_at' => now()]);
-        InvoicePaid::dispatch($invoice);
+        DB::transaction(function () use ($invoice): void {
+            $invoice->update(['paid_at' => now()]);
+            InvoicePaid::dispatch($invoice);
+        });
     }
 }
 ```
@@ -85,6 +109,27 @@ protected $listen = [
     ],
 ];
 ```
+
+```php
+// Anti-pattern: listener bundles multiple unrelated reactions
+class HandleInvoicePaid implements ShouldQueue
+{
+    public function handle(InvoicePaid $event): void
+    {
+        $event->invoice->user->notify(new InvoicePaidNotification($event->invoice));
+        app(UpdateAccountingRecords::class)->execute($event->invoice);
+    }
+}
+```
+
+## Checklist
+
+- [ ] Event name is past tense and describes a completed fact.
+- [ ] Event class contains data only.
+- [ ] Each listener performs exactly one side effect.
+- [ ] Deferred listeners implement `ShouldQueue`.
+- [ ] Critical queued listeners implement `failed()`.
+- [ ] Event dispatch happens from an Action, not directly from controller/model.
 
 ## Anti-Patterns
 

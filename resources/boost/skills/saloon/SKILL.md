@@ -1,12 +1,32 @@
 ---
 name: saloon
 description: Saloon-based service layer pattern for all external API integrations. Every new external API integration must use Saloon — no raw HTTP calls.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
-**Name:** Saloon API Integration
-**Description:** Saloon-based service layer pattern for all external API integrations. Every new external API integration must use Saloon — no raw HTTP calls.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Services/**/*.php, laravel, php, backend, saloon, api, http-client, integration
+# Saloon
+
+## When to Use
+
+- For all external API integrations from application code.
+- When an integration needs request classes, typed DTO mapping, and testable connector wiring.
+- When building or refactoring service-layer API clients under `app/Services/{ServiceName}/`.
+
+## When NOT to Use
+
+- For internal Laravel-to-Laravel calls inside the same app boundary.
+- For one-off, simple binary file downloads (for example downloading a public PDF by URL), where inline `Http::get()` is acceptable.
+- For LLM integrations that already use Prism conventions.
+
+## Preconditions
+
+- `saloonphp/saloon` is installed and configured.
+- API credentials and endpoints are defined in `config/services.php`.
+- A service class exists (or is planned) to wrap connector usage and DTO mapping.
 
 ## Rules
 
@@ -22,6 +42,7 @@ description: Saloon-based service layer pattern for all external API integration
 - Register the connector as a singleton in a service provider when needed
 - Accept an optional connector in the service constructor for testability
 - Exceptions: **Prism** is acceptable for LLM integrations; inline `Http::get()` is acceptable for simple binary file downloads (not API integrations)
+- Follow general service conventions from `Services/SKILL.md` for naming and class boundaries
 
 ## Examples
 
@@ -91,8 +112,46 @@ class ListChargesRequest extends Request
 ```
 
 ```php
+// POST Request
+use Saloon\Contracts\Body\HasBody;
+use Saloon\Enums\Method;
+use Saloon\Http\Request;
+use Saloon\Traits\Body\HasJsonBody;
+
+class CreateChargeRequest extends Request implements HasBody
+{
+    use HasJsonBody;
+
+    protected Method $method = Method::POST;
+
+    public function __construct(
+        protected int $amount,
+        protected string $currency,
+        protected string $customerId,
+    ) {}
+
+    public function resolveEndpoint(): string
+    {
+        return '/charges';
+    }
+
+    protected function defaultBody(): array
+    {
+        return [
+            'amount'   => $this->amount,
+            'currency' => $this->currency,
+            'customer' => $this->customerId,
+        ];
+    }
+}
+```
+
+```php
 // Service class
+use Saloon\Exceptions\Request\FatalRequestException;
+use Saloon\Exceptions\Request\RequestException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class StripeService
 {
@@ -104,15 +163,29 @@ class StripeService
     /** @return Collection<int, ChargeData> */
     public function listCharges(string $customerId): Collection
     {
-        $response = $this->connector->send(
-            new ListChargesRequest(customer: $customerId)
-        );
+        try {
+            $response = $this->connector->send(
+                new ListChargesRequest(customer: $customerId)
+            );
+        } catch (RequestException|FatalRequestException $exception) {
+            Log::warning('Stripe request failed.', [
+                'customer_id' => $customerId,
+                'message' => $exception->getMessage(),
+            ]);
+            throw $exception;
+        }
 
         return collect($response->json('data'))
             ->map(fn (array $item) => ChargeData::fromArray($item));
     }
 }
 ```
+
+## Testing Guidance
+
+- Inject a fake or mocked connector into the service constructor.
+- Assert request class behavior (`resolveEndpoint()`, `defaultQuery()`, `defaultBody()`) independently.
+- Service tests should verify DTO mapping and error propagation, not raw HTTP internals.
 
 ## Anti-Patterns
 

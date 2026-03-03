@@ -1,27 +1,48 @@
 ---
 name: phpunit
 description: PHPUnit test structure, naming, assertions, and factory conventions for Laravel feature and unit tests.
+compatible_agents:
+  - test
+  - refactor
+  - review
 ---
 
-**Name:** PHPUnit
-**Description:** PHPUnit test structure, naming, assertions, and factory conventions for Laravel feature and unit tests.
-**Compatible Agents:** general-purpose, testing
-**Tags:** tests/**/*.php, laravel, php, testing, phpunit, unit-test, feature-test
+# PHPUnit
+
+## When to Use
+
+- Writing or refactoring PHPUnit-style tests in Laravel codebases.
+- Maintaining existing class-based test suites alongside Pest-based files.
+- Creating focused unit tests for pure PHP logic and feature tests for HTTP/database flows.
+
+## When Not to Use
+
+- Browser/E2E flows requiring JavaScript execution (use Dusk).
+- New tests in a code area that is standardized on Pest syntax only.
+- Integration scenarios where external systems should be faked/stubbed at a higher level.
+
+## Preconditions
+
+- `phpunit.xml` / `phpunit.xml.dist` is present and configured for this project.
+- Test database configuration is isolated from development data.
+- Factories exist (or are added) for models under test.
+- Team conventions for Pest vs PHPUnit style are known for the touched test area.
+
+## Process Checklist
+
+- [ ] Pick the right test type: unit (`tests/Unit`) vs feature (`tests/Feature`).
+- [ ] Use `RefreshDatabase` in feature tests that modify/query DB state.
+- [ ] Keep one assertion concern per test method.
+- [ ] Use strict assertions (`assertSame`) when type and value matter.
+- [ ] Use model factories and states; avoid manual low-level inserts.
+- [ ] Run targeted tests first, then full impacted suite.
 
 ## Rules
 
-- **Feature tests** go in `tests/Feature/` and extend `Tests\TestCase`
-- **Unit tests** go in `tests/Unit/` and extend `PHPUnit\Framework\TestCase`
-- Always use `Illuminate\Foundation\Testing\RefreshDatabase` in feature tests that touch the database
-- Unit tests have no Laravel bootstrap — pure PHP tests only
-- Use `test_` method prefix with snake_case names: `test_user_can_create_resource`
-- All test methods must have `: void` return type
-- One assertion concern per test method — keep tests focused
-- Prefer `assertSame` over `assertEquals` for strict type + value comparison
-- Assert specific values, not just truthiness
-- Every new model **must** have a corresponding factory in `database/factories/`
-- Use factories in tests instead of manual `create()` / `insert()` calls
-- Define meaningful default factory values; use states for variations
+- Feature tests extend `Tests\TestCase`; unit tests extend `PHPUnit\Framework\TestCase`.
+- Use `test_` snake_case method names and `: void` return types.
+- Keep tests deterministic and specific in assertions.
+- Favor factories/states over hand-crafted persistence setup.
 
 ## Examples
 
@@ -77,6 +98,28 @@ public function unverified(): static
 User::factory()->create();
 User::factory()->unverified()->create();
 ```
+
+## Run Commands
+
+```bash
+# Full Laravel test run (recommended entrypoint)
+php artisan test
+
+# Run PHPUnit directly
+vendor/bin/phpunit
+
+# Run a single file
+vendor/bin/phpunit tests/Feature/InvoiceControllerTest.php
+
+# Filter by test method name
+vendor/bin/phpunit --filter=test_user_can_create_invoice
+```
+
+## Testing Guidance
+
+- Run the smallest relevant subset while iterating, then run full impacted suites.
+- Keep test naming aligned with behavior, not implementation details.
+- Prefer explicit assertions for DB rows, response structure, and domain outputs.
 
 ## Anti-Patterns
 

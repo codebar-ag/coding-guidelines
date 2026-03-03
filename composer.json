@@ -1,23 +1,19 @@
 {
     "name": "codebar-ag/coding-guidelines",
-    "type": "composer-plugin",
+    "type": "library",
     "description": "Shared Laravel coding guidelines and skills for codebar-ag projects. Composer package for Laravel Boost.",
     "keywords": [
         "laravel",
         "boost",
-        "cursor",
         "coding-guidelines",
         "skills"
     ],
     "license": "MIT",
     "require": {
-        "composer-plugin-api": "^2.0",
-        "illuminate/console": "^12.0",
-        "illuminate/support": "^12.0",
+        "illuminate/console": "^12.41.1",
+        "illuminate/support": "^12.41.1",
+        "laravel/boost": "^2.2",
         "php": "^8.4"
-    },
-    "suggest": {
-        "laravel/boost": "Required for skill discovery. Install in your Laravel project."
     },
     "autoload": {
         "psr-4": {
@@ -29,24 +25,18 @@
             "CodebarAg\\CodingGuidelines\\Tests\\": "tests/"
         }
     },
-    "extra": {
-        "class": "CodebarAg\\CodingGuidelines\\Composer\\RefactorCommandPlugin",
-        "laravel": {
-            "providers": [
-                "CodebarAg\\CodingGuidelines\\CodingGuidelinesServiceProvider"
-            ]
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     },
-    "scripts": {
-        "validate-skills": "php scripts/validate-skills.php",
-        "sync-guidelines": "php scripts/sync-guidelines.php"
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require-dev": {
-        "laravel/pint": "^1.27"
+        "laravel/pint": "^1.27",
+        "phpunit/phpunit": "^11.0",
+        "laravel/ai": "^0.2.0",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
     }
 }

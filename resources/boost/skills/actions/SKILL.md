@@ -1,25 +1,74 @@
 ---
 name: actions
 description: Single-purpose business logic classes that encapsulate one well-defined business operation. Actions are the primary location for business logic in Laravel applications, invoked from controllers, commands, or jobs.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
-**Name:** Actions
-**Description:** Single-purpose business logic classes that encapsulate one well-defined business operation. Actions are the primary location for business logic in Laravel applications, invoked from controllers, commands, or jobs.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Actions/**/*.php, laravel, php, backend, business-logic, action
+# Actions
 
-## Rules
+## When to Apply
 
-- Action classes live in `app/Actions/`
-- Each action represents **one single business operation** — if you can't describe it in a single sentence, split it up
-- Use a clear verb-noun naming pattern: `CreateInvoice`, `SendPasswordResetEmail`, `ArchiveExpiredSubscriptions`
-- Never use vague names like `InvoiceAction` or `UserHandler`
-- Actions expose a single public `execute()` method
-- Keep the constructor for dependency injection only
-- Actions are resolved via the service container
-- Never include HTTP concerns (request, response, redirects) in an action
-- Never put multi-domain orchestration in an action — use a Service instead
-- Never put reusable formatting or utility logic in an action — use a Helper
+- When implementing or refactoring a **single business operation** that can be described in one sentence.
+- When slimming **fat controllers, commands, or jobs** by moving business logic out of them.
+- When multiple entry points (controller, command, job, listener) should reuse the **same business logic**.
+- When aligning legacy code with the project’s pattern of **`app/Actions/` classes with `execute()`**.
+
+## When Not to Use
+
+- Tiny, one-line behavior that naturally belongs on the model and has no reuse.
+- Cross-domain orchestration with retries/workflows that should be a Service.
+- HTTP boundary concerns (validation/response shaping) that belong in controllers/requests.
+
+## Preconditions
+
+- The Laravel project is installed and bootstrapped.
+- The `app/Actions/` directory exists (or will be created) and is autoloaded by Composer.
+- Related models, notifications, events, and DTOs required by the action already exist or have a clear design. If prerequisites are missing, create them first or narrow the Action scope.
+- Authorization and validation rules are defined at the controller, policy, or Form Request level.
+
+## Process
+
+### 1. Decide if an Action is Appropriate
+
+- Confirm the work is a **single business operation**, not multi-step orchestration across domains.
+- Prefer an Action when:
+  - The behavior will be reused from multiple places.
+  - The behavior is business logic, not HTTP or infrastructure logic.
+- If the behavior crosses multiple domains or requires complex orchestration, prefer a **Service** instead.
+
+### 2. Design the Action
+
+- Place the class in `app/Actions/`.
+- Use a clear verb–noun naming pattern:
+  - Examples: `CreateInvoice`, `SendPasswordResetEmail`, `ArchiveExpiredSubscriptions`.
+  - Avoid vague names like `InvoiceAction`, `UserHandler`, `DataProcessor`.
+- Plan for a **single public `execute()` method** that represents the operation.
+- Keep the constructor for dependency injection only (repositories, services, helpers, etc.).
+
+### 3. Implement the Action
+
+- Implement `execute()` with the full business operation:
+  - Perform any database writes and domain logic required for the operation.
+  - Call other Actions or Services as needed, but keep the responsibility focused.
+- Resolve the Action through the **service container** (type-hint it in controllers, commands, or jobs).
+- Do **not**:
+  - Include HTTP concerns (`Request`, `Response`, redirects) inside the Action.
+  - Include cross-domain orchestration that belongs in a Service.
+  - Put reusable formatting or generic utility logic here (use Helpers instead).
+
+### 4. Integrate from Controllers, Commands, and Jobs
+
+- In controllers:
+  - Validate input via Form Requests.
+  - Authorize via policies or `$this->authorize()`.
+  - Inject the Action and call `execute()` with validated data or models.
+- In console commands or queued jobs:
+  - Resolve the Action from the container.
+  - Iterate over models or DTOs and delegate the business operation to `execute()`.
 
 ## Examples
 
@@ -78,14 +127,44 @@ class GenerateInvoicesCommand extends Command
 }
 ```
 
-## Anti-Patterns
+## Checklists
 
-- Putting HTTP concerns (`Request`, `Response`, redirects) inside an action
-- Creating multi-step orchestration across domains in a single action (use a Service)
-- Naming an action vaguely: `InvoiceAction`, `UserHandler`, `DataProcessor`
-- Adding multiple `execute()` methods or public methods beyond the single operation
-- Adding business logic in a constructor — use `execute()` for that
-- Performing database queries unrelated to the action's single responsibility
+### Execution Checklist
+
+- [ ] Verified the behavior is a **single business operation** appropriate for an Action.
+- [ ] Created or updated a class under `app/Actions/` with a clear verb–noun name.
+- [ ] Implemented a single public `execute()` method for the operation.
+- [ ] Kept the constructor for dependency injection only.
+- [ ] Removed HTTP concerns from the Action (validation, requests, responses, redirects).
+- [ ] Ensured authorization is handled in controllers, policies, or Form Requests.
+- [ ] Updated controllers, commands, or jobs to **delegate to the Action** instead of duplicating logic.
+
+## Testing Guidance
+
+- Add focused tests for each Action behavior branch (success/failure edge cases).
+- Mock/fake external dependencies (mail, notifications, queue) and assert interaction boundaries.
+- Keep integration coverage in feature tests where the Action is invoked from controllers/commands/jobs.
+
+## Safety / Things to Avoid
+
+- Putting HTTP concerns (`Request`, `Response`, redirects) inside an Action.
+- Creating multi-step orchestration across domains in a single Action (use a Service instead).
+- Naming an Action vaguely, for example `InvoiceAction`, `UserHandler`, `DataProcessor`.
+- Adding multiple `execute()` methods or extra public methods beyond the single operation.
+- Adding business logic in a constructor — keep it in `execute()`.
+- Performing database queries unrelated to the Action’s single responsibility.
+
+```php
+// Anti-pattern: Action doing orchestration + HTTP concerns
+class ProcessInvoiceAction
+{
+    public function execute(Request $request): RedirectResponse
+    {
+        // Mixed responsibilities: validation, orchestration, and HTTP response
+        // Move validation/response to controller, orchestration to Service.
+    }
+}
+```
 
 ## References
 

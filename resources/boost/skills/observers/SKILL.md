@@ -1,12 +1,26 @@
 ---
 name: observers
 description: Centralised classes that react to Eloquent model lifecycle events. Used for side effects that should always fire regardless of where a model is mutated — such as notifications, cache invalidation, and audit logging.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
-**Name:** Observers
-**Description:** Centralised classes that react to Eloquent model lifecycle events. Used for side effects that should always fire regardless of where a model is mutated — such as notifications, cache invalidation, and audit logging.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Observers/**/*.php, laravel, php, backend, observer, eloquent, model-events
+# Observers
+
+## When to Use
+
+- A side effect must run on every model lifecycle mutation, regardless of call site.
+- The behavior is model-centric (cache invalidation, audit trail, lightweight notifications).
+- Multiple code paths mutate the same model and should trigger consistent reactions.
+
+## When Not to Use
+
+- Side effects should run only in one explicit workflow (use an Action).
+- You need precise control over exactly when logic runs in a business transaction.
+- The logic is complex orchestration (use a Service/Event pipeline).
 
 ## Rules
 
@@ -56,6 +70,29 @@ public function boot(): void
 }
 ```
 
+```php
+// Anti-pattern: observer used where explicit Action flow is required
+class InvoiceObserver
+{
+    public function updated(Invoice $invoice): void
+    {
+        if ($invoice->status === 'paid') {
+            app(SendPaidInvoiceEmail::class)->execute($invoice);
+        }
+    }
+}
+
+// Better: explicit flow in Action for predictable control
+class MarkInvoicePaid
+{
+    public function execute(Invoice $invoice): void
+    {
+        $invoice->update(['status' => 'paid']);
+        app(SendPaidInvoiceEmail::class)->execute($invoice);
+    }
+}
+```
+
 **Available lifecycle events:**
 
 | Method | Fires when... |
@@ -71,6 +108,8 @@ public function boot(): void
 | `restoring` | Before a soft-deleted model is restored |
 | `restored` | After a soft-deleted model is restored |
 
+`creating`, `updating`, `saving`, `deleting`, and `restoring` run before persistence and may cancel the operation by returning `false` when needed.
+
 ## Anti-Patterns
 
 - Using an observer for side effects specific to one particular action (use the Action directly instead)
@@ -83,5 +122,6 @@ public function boot(): void
 ## References
 
 - [Laravel Observers](https://laravel.com/docs/eloquent#observers)
+- [Laravel Model Events](https://laravel.com/docs/eloquent#events)
 - Related: `Models/SKILL.md` — Eloquent model conventions
 - Related: `Events/SKILL.md` — alternative for decoupled side effects

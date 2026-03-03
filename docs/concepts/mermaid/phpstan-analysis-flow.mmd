@@ -1,0 +1,13 @@
+flowchart TD
+  start[Start] --> preconditions["Verify preconditions"]
+  preconditions --> initialAnalysis["Run initial PHPStan analysis"]
+  initialAnalysis --> categorizeErrors["Categorize errors"]
+  categorizeErrors --> fixIteratively["Fix errors iteratively"]
+  fixIteratively --> rerunPhpstan["Re-run PHPStan on scope"]
+  rerunPhpstan --> decisionMoreErrors{"More in-scope errors?"}
+  decisionMoreErrors -->|Yes| categorizeErrors
+  decisionMoreErrors -->|No| runTests["Run automated tests"]
+  runTests --> decisionTestsPass{"Tests pass?"}
+  decisionTestsPass -->|No| fixIteratively
+  decisionTestsPass -->|Yes| done[Done]
+
