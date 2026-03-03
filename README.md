@@ -54,17 +54,20 @@ No extra configuration is required beyond installing the package and running the
 Laravel Boost acts as the **index** between your Laravel project and AI agents.  
 This package provides the **skills and rules** for that index; the agents are *personas* you prompt in your tools.
 
-See `AGENTS.md` for full details. In short, you have five roles:
+See `AGENTS.md` for full details. In short, the current role set includes:
 
 - **ArchitectAgent**: designs features (routes, models, actions, services, events).
-- **ImplementationAgent**: implements and updates code according to the skills.
+- **BackendImplementationAgent**: implements backend code from approved designs.
+- **FrontendImplementationAgent**: implements frontend-facing pieces from backend contracts.
+- **ImplementationAgent**: handles small, self-contained full-stack changes.
 - **RefactorAgent**: brings existing code into guideline compliance safely.
 - **TestAgent**: improves tests and static analysis.
 - **ReviewAgent**: reviews changes and proposes refactors (used in CI).
+- **DocumentationAgent**: keeps docs and guidance aligned with the current architecture.
 
 ### Example prompts (Claude Desktop / Terminal)
 
-Copy‑paste and adapt these when talking to Claude Desktop/Terminal with Boost enabled:
+Copy-paste and adapt these when talking to Claude Desktop/Terminal with Boost enabled. The examples below are common starting points; for full role coverage see `AGENTS.md`.
 
 - **ArchitectAgent**
 
@@ -151,7 +154,7 @@ Skills are reusable convention and workflow guides that assistants use when work
 | **Testing** | PHPUnit, PestTesting, PHPStan, Dusk | Unit/feature tests, static analysis, browser tests |
 | **Services** | Saloon, DocuWare, Albatros | External API integrations (Saloon, DocuWare, Albatros) |
 
-**Total: 36 skills.**
+**Total: 37 skills.**
 
 ---
 
