@@ -1,14 +1,14 @@
 ---
 name: actions
 description: Single-purpose business logic classes that encapsulate one well-defined business operation. Actions are the primary location for business logic in Laravel applications, invoked from controllers, commands, or jobs.
+compatible_agents:
+  - architect
+  - implement
+  - refactor
+  - review
 ---
 
 # Actions
-
-**Name:** Actions  
-**Description:** Single-purpose business logic classes that encapsulate one well-defined business operation. Actions are the primary location for business logic in Laravel applications, invoked from controllers, commands, or jobs.  
-**Compatible Agents:** general-purpose, backend  
-**Tags:** app/Actions/**/*.php, laravel, php, backend, business-logic, action
 
 ## When to Apply
 
@@ -17,11 +17,17 @@ description: Single-purpose business logic classes that encapsulate one well-def
 - When multiple entry points (controller, command, job, listener) should reuse the **same business logic**.
 - When aligning legacy code with the project’s pattern of **`app/Actions/` classes with `execute()`**.
 
+## When Not to Use
+
+- Tiny, one-line behavior that naturally belongs on the model and has no reuse.
+- Cross-domain orchestration with retries/workflows that should be a Service.
+- HTTP boundary concerns (validation/response shaping) that belong in controllers/requests.
+
 ## Preconditions
 
 - The Laravel project is installed and bootstrapped.
 - The `app/Actions/` directory exists (or will be created) and is autoloaded by Composer.
-- Related models, notifications, events, and DTOs required by the action already exist or have a clear design.
+- Related models, notifications, events, and DTOs required by the action already exist or have a clear design. If prerequisites are missing, create them first or narrow the Action scope.
 - Authorization and validation rules are defined at the controller, policy, or Form Request level.
 
 ## Process
@@ -133,6 +139,12 @@ class GenerateInvoicesCommand extends Command
 - [ ] Ensured authorization is handled in controllers, policies, or Form Requests.
 - [ ] Updated controllers, commands, or jobs to **delegate to the Action** instead of duplicating logic.
 
+## Testing Guidance
+
+- Add focused tests for each Action behavior branch (success/failure edge cases).
+- Mock/fake external dependencies (mail, notifications, queue) and assert interaction boundaries.
+- Keep integration coverage in feature tests where the Action is invoked from controllers/commands/jobs.
+
 ## Safety / Things to Avoid
 
 - Putting HTTP concerns (`Request`, `Response`, redirects) inside an Action.
@@ -141,6 +153,18 @@ class GenerateInvoicesCommand extends Command
 - Adding multiple `execute()` methods or extra public methods beyond the single operation.
 - Adding business logic in a constructor — keep it in `execute()`.
 - Performing database queries unrelated to the Action’s single responsibility.
+
+```php
+// Anti-pattern: Action doing orchestration + HTTP concerns
+class ProcessInvoiceAction
+{
+    public function execute(Request $request): RedirectResponse
+    {
+        // Mixed responsibilities: validation, orchestration, and HTTP response
+        // Move validation/response to controller, orchestration to Service.
+    }
+}
+```
 
 ## References
 

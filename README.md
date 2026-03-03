@@ -270,15 +270,18 @@ If your editor supports MCP (Model Context Protocol), configure it to use the Bo
 This package validates its own skills using Pest and the [Laravel AI SDK](https://laravel.com/docs/12.x/ai-sdk):
 
 - **Run locally**: `vendor/bin/pest --group=skills`
-- **Environment**: Set `ANTHROPIC_API_KEY` and optionally `ANTHROPIC_MODEL` (default: `claude-3-5-sonnet@20240620`).
+- **Environment**: Set `ANTHROPIC_API_KEY` and optionally `ANTHROPIC_MODEL` (default in `phpunit.xml.dist`: `claude-haiku-4-5`).
+- **Retries**: optionally set `SKILL_VALIDATION_MAX_ATTEMPTS` (default: `3`) to control strict fail-after-retry behavior for temporary provider overloads.
 - **PHPUnit config**: `phpunit.xml.dist` is committed; copy to `phpunit.xml` (gitignored) for local overrides.
 
 The `.github/workflows/skills-validation.yml` workflow runs these checks on pushes and pull requests. Configure `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` as GitHub secrets.
 
-Under the hood, skills validation is performed by a small Laravel AI agent and a queued job:
+Under the hood, skills validation is performed by a small Laravel AI agent and supports both direct test execution and queued batch execution:
 
-- **Dispatch**: a `skills:validate` console command discovers each `resources/boost/skills/**/SKILL.md` file and dispatches a validation job per file.
-- **Execution**: each job calls the Laravel AI agent once, then appends a JSON line with the input markdown, structured output, and any provider usage metadata to `storage/logs/skills-validation.log`.
-- **Provider overloads**: if the Anthropic provider is temporarily overloaded, the job records an `overloaded` status for that skill instead of failing the whole test run.
+- **Per-skill tests**: `vendor/bin/pest --group=skills` runs one live Anthropic validation test per `SKILL.md` file (currently 37 tests), so failures are isolated by file.
+- **Batch command**: `skills:validate` discovers each `resources/boost/skills/**/SKILL.md` file and dispatches (or runs with `--sync`) one validation job per file.
+- **Logging**: each validation appends JSON lines to `storage/logs/skills-validation.log`, including the input markdown, structured output, usage/token metadata, provider status, retry attempt metadata, and output-quality audit fields.
+- **Strict overload handling**: both per-skill tests and queue jobs retry bounded times and then fail explicitly when Anthropic remains overloaded.
+- **Queue safety**: queued batch validation keeps queue-level retries/backoff in `ValidateSkillJob` in addition to bounded in-job retries for transient overloads.
 
-To keep CI stable, the Pest feature test for skills only asserts **that the correct jobs are dispatched**; the actual AI calls and token usage reporting happen inside the queued jobs.
+CI now validates skills directly through the per-skill test dataset, while the queue command remains available for manual or maintenance batch runs.

@@ -8,22 +8,45 @@ compatible_agents:
   - review
 ---
 
-**Name:** Traits
-**Description:** Reusable behaviour shared across multiple unrelated classes. Traits provide shared Eloquent scopes, accessors, lifecycle hooks, and small stateless helper methods.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Traits/**/*.php, laravel, php, backend, trait, reusable, eloquent
+# Traits
 
-## Rules
+## When to Apply
 
-- Trait classes live in `app/Traits/`
-- Each trait should have a **single, clearly defined responsibility**
-- Use descriptive names that reflect the behaviour they provide, not the classes that use them
-- Suffix with `able` when the trait grants a capability: `Archivable`, `Taggable`, `Sluggable`
-- Use a noun phrase when grouping related accessors/scopes: `HasTimestamps`, `HasAddress`
-- Use a trait only when the **same behaviour is needed across multiple unrelated classes**
-- Use `bootTraitName()` to hook into the model lifecycle without overriding `boot()` in the model
-- Use `initializeTraitName()` to set default property values on instantiation
-- Never put complex business logic in a trait — use an Action or Service
+- Use when the same behavior is needed across multiple unrelated classes.
+- Use for shared Eloquent scopes, lightweight accessors, and lifecycle hooks.
+- Prefer composition/services when behavior needs dependencies or heavy orchestration.
+- Do not use traits to avoid proper architecture decisions (single-class reuse or hidden business logic).
+
+## Preconditions
+
+- Trait file will live in `app/Traits/`.
+- Behavior is self-contained and has one clear responsibility.
+- If used on models, boot/init method names are unique and intentional (`bootTraitName`, `initializeTraitName`).
+
+## Process
+
+### 1. Confirm Trait Is the Right Abstraction
+
+- Reuse must span multiple unrelated classes.
+- If reuse is only one class, keep logic inline.
+- If logic needs external services, use an Action/Service class instead.
+
+### 2. Implement a Focused Trait
+
+- Name by capability (`Archivable`, `Sluggable`) or coherent concern (`HasAddress`).
+- Keep methods small and deterministic.
+- Avoid hidden side effects outside the stated capability.
+
+### 3. Handle Lifecycle Hooks Safely
+
+- Use `bootTraitName()` for model event hooks.
+- Use `initializeTraitName()` for default property setup.
+- When stacking traits, ensure hook behavior remains predictable and does not duplicate writes.
+
+### 4. Test Trait Behavior
+
+- Add focused tests via a model or test double that uses the trait.
+- Test positive and negative paths for scopes/hooks.
 
 ## Examples
 
@@ -62,6 +85,19 @@ trait Archivable
 ```
 
 ```php
+// Counter-example: avoid business orchestration in traits.
+trait InvoiceSettlementTrait
+{
+    public function settleInvoice(): void
+    {
+        // Bad: side effects, payment gateway, and notifications in trait.
+        $this->paymentGateway->charge($this->invoice_total);
+        Mail::to($this->user)->send(new InvoiceSettledMail($this));
+    }
+}
+```
+
+```php
 trait Sluggable
 {
     public static function bootSluggable(): void
@@ -87,6 +123,20 @@ $post->archive();
 Post::archived()->get();
 ```
 
+```php
+// Trait testing approach (feature/unit test setup)
+$post = Post::factory()->create(['archived_at' => null]);
+$post->archive();
+$this->assertTrue($post->isArchived());
+```
+
+## Checklists
+
+- [ ] Trait reuse is across multiple unrelated classes.
+- [ ] Trait has one responsibility and no service dependencies.
+- [ ] Lifecycle hooks use proper `bootTraitName` / `initializeTraitName` methods.
+- [ ] Tests cover scopes/hooks and side effects.
+
 ## Anti-Patterns
 
 - Creating a trait for logic that only exists in one class (keep it inline)
@@ -99,4 +149,5 @@ Post::archived()->get();
 
 - [PHP Traits](https://www.php.net/manual/en/language.oop5.traits.php)
 - [Laravel Model Booting](https://laravel.com/docs/eloquent#boot-and-initialize-traits)
-- Related: `Models/SKILL.md` — where traits are used on Eloquent models
+- [Laravel Testing](https://laravel.com/docs/testing)
+- `resources/boost/skills/models/SKILL.md` (trait usage in Eloquent models)

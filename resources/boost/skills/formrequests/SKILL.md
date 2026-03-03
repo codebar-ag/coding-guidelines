@@ -7,15 +7,24 @@ compatible_agents:
   - review
 ---
 
-**Name:** Form Requests
-**Description:** Dedicated validation classes for all controller input. Form Requests encapsulate validation rules, authorization, and error messages outside of controllers.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Http/Requests/**/*.php, app/Http/Controllers/**/*.php, laravel, php, backend, validation, form-request
+# Form Requests
+
+## When to Use
+
+- For controller endpoints that accept user input and need validation + authorization.
+- When you want reusable, testable validation outside controllers.
+- When localized or domain-specific validation messages are required.
+
+## When NOT to Use
+
+- For read-only endpoints with no user input to validate.
+- For internal-only workflows that do not pass through HTTP controllers.
+- For cross-cutting protocol checks better handled in middleware (for example signature headers).
 
 ## Rules
 
-- Every controller action that accepts user input **must** use a dedicated `FormRequest` class
-- Never call `$request->validate()` or `Validator::make()` inside a controller
+- Every controller action that accepts user input **must** use a dedicated `FormRequest` class (keeps controllers thin and validations testable)
+- Never call `$request->validate()` or `Validator::make()` inside a controller (avoid duplicated inline rules)
 - Place Form Requests in `app/Http/Requests/` or a subdirectory matching the domain (e.g. `Auth/`)
 - Naming pattern: `Store{Resource}Request`, `Update{Resource}Request`
 - Match the resource name to the controller: `StoreSprintController` → `StoreSprintRequest`
@@ -23,10 +32,13 @@ compatible_agents:
 - Define `rules(): array` with a PHPDoc `@return` array shape
 - Use **array-based** rule definitions, not pipe-delimited strings
 - Add `messages(): array` when validation messages need localization or extra clarity
+- Prefer `$this->user()` over global helpers for request-bound auth access inside `authorize()` and `rules()`
 
 ## Examples
 
 ```php
+use Illuminate\Validation\Rule;
+
 class StoreSprintRequest extends FormRequest
 {
     public function authorize(): bool
@@ -42,6 +54,11 @@ class StoreSprintRequest extends FormRequest
         return [
             'title'  => ['required', 'string', 'max:255'],
             'locale' => ['required', Locale::validationRule()],
+            'billing_code' => Rule::when(
+                $this->user()?->isAdmin() === true,
+                ['required', 'string', 'max:50'],
+                ['nullable']
+            ),
         ];
     }
 

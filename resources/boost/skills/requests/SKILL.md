@@ -7,10 +7,26 @@ compatible_agents:
   - review
 ---
 
-**Name:** Form Request Validation
-**Description:** Dedicated Form Request validation classes for all controller input. Every endpoint that accepts user input must use a `FormRequest` class — validation never happens directly inside a controller.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Http/Requests/**/*.php, laravel, php, backend, validation, request, form-request
+# Requests
+
+## When to Use
+
+- When HTTP endpoints accept client-provided input.
+- When authorization and validation should be reusable and independently testable.
+- When request payloads include nested structures or conditional fields.
+- During implementation (new endpoints) and refactoring (moving inline validation out of controllers).
+
+## When NOT to Use
+
+- For endpoints with no input payload to validate.
+- For internal jobs/actions that are not request-driven.
+- For protocol-level checks that belong in middleware.
+
+## Preconditions
+
+- Standard Laravel `app/Http/Requests/` structure exists.
+- Gate/Policy setup is available for authorization checks.
+- Controllers are injecting Form Requests rather than validating inline.
 
 ## Rules
 
@@ -22,6 +38,8 @@ compatible_agents:
 - Define `rules(): array` with a PHPDoc `@return` array shape annotation
 - Use **array-based** rule definitions — not pipe-delimited strings
 - Override `messages(): array` for user-friendly or localized error messages
+- Treat `return true` in `authorize()` as explicit and safe only for genuinely public/non-sensitive operations
+- Prefer FormRequest helpers over raw input access: `validated()`, `safe()`, and typed retrieval methods where needed
 
 ## Examples
 
@@ -67,6 +85,58 @@ public function authorize(): bool
 
     // Delegate to a policy
     return $this->user()->can('update', $this->route('invoice'));
+}
+```
+
+```php
+// Nested + conditional validation example
+use Illuminate\Validation\Rule;
+
+public function rules(): array
+{
+    return [
+        'lines' => ['required', 'array', 'min:1'],
+        'lines.*.sku' => ['required', 'string'],
+        'lines.*.quantity' => ['required', 'integer', 'min:1'],
+        'internal_note' => Rule::when(
+            $this->user()?->isAdmin() === true,
+            ['nullable', 'string', 'max:500'],
+            ['prohibited']
+        ),
+    ];
+}
+```
+
+## Refactor Workflow (Inline Validation to FormRequest)
+
+1. Move inline validation rules from controller to a new `FormRequest`.
+2. Move authorization logic from controller conditionals to `authorize()`.
+3. Inject the new `FormRequest` into the controller action signature.
+4. Replace raw input usage with `$request->validated()`.
+5. Add targeted tests for validation rules and authorization outcomes.
+
+```php
+// Before: controller owns validation and input concerns
+public function store(Request $request): JsonResponse
+{
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+    ]);
+
+    $project = Project::create($validated);
+
+    return response()->json($project, 201);
+}
+```
+
+```php
+// After: controller delegates to FormRequest
+public function store(StoreProjectRequest $request): JsonResponse
+{
+    $project = Project::create($request->validated());
+    $meta = $request->safe()->only(['name']);
+
+    return response()->json(['data' => $project, 'meta' => $meta], 201);
 }
 ```
 

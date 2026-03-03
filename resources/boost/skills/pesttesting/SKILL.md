@@ -7,29 +7,43 @@ compatible_agents:
   - review
 ---
 
-**Name:** Pest Testing
-**Description:** Laravel testing conventions using the Pest PHP framework. Covers test structure, AAA pattern, HTTP assertions, datasets, mocking, browser tests, and architecture tests.
-**Compatible Agents:** general-purpose, testing
-**Tags:** tests/**/*.php, laravel, php, testing, pest, feature-test, unit-test, browser-test
+# Pest Testing
+
+## When to Use
+
+- Writing new tests in projects that standardize on Pest syntax.
+- Refactoring older tests into fluent, readable behavior descriptions.
+- Adding datasets, architecture tests, and expressive HTTP assertions.
+
+## When Not to Use
+
+- Existing areas intentionally locked to class-based PHPUnit style.
+- Browser tests without real browser requirements (use feature tests instead).
+- Non-test automation scripts where Pest semantics do not apply.
+
+## Preconditions
+
+- Pest is installed and configured for Laravel (`vendor/bin/pest` works).
+- Test bootstrap and DB setup are available (`phpunit.xml`/env test config).
+- Team conventions for test file placement and naming are understood.
+- Fakes/mocks strategy is clear for external integrations.
+
+## Process Checklist
+
+- [ ] Write tests in Pest syntax (`it`, `describe`, `expect`).
+- [ ] Structure each test as AAA with concise comments.
+- [ ] Use named response assertions (`assertCreated`, `assertForbidden`, etc.).
+- [ ] Add `uses(RefreshDatabase::class)` for DB-touching files.
+- [ ] Replace duplicated cases with datasets.
+- [ ] Run targeted tests first, then full impacted scope.
 
 ## Rules
 
-- Always use **Pest syntax** — never raw PHPUnit classes or `$this->assert*` outside of HTTP responses
-- Always follow **AAA**: Arrange → Act → Assert, with a comment label for each section
-- Always use **named HTTP assertion methods** — never `assertStatus(int)` with a raw integer
-- Never delete a test without explicit approval
-- Test files mirror the class they test: `UserController` → `UserControllerTest.php`
-- Test descriptions read as plain English: `it('creates an invoice for the given order')`
-- Group related tests with `describe()` named after the class or feature under test
-- Use `uses(RefreshDatabase::class)` in every test file that touches the database
-- Use `beforeEach()` inside `describe()` blocks for shared setup — never repeat setup across tests
-- Use datasets instead of duplicating tests for multiple inputs
-- Prefer **Laravel fakes** over mocks for events, mail, notifications, and queues
-- Browser tests: always use `DatabaseTruncation` — never `RefreshDatabase`
-- Browser tests: always call `assertNoJavaScriptErrors()` after every `visit()`
-- Browser tests: always use `dusk=""` HTML attributes as selectors — never CSS classes or IDs
-- Browser tests: never use `pause()` — use `waitFor()`, `waitForText()`, or `waitUntilMissing()`
-- Add architecture tests in `tests/Architecture/` to enforce conventions automatically
+- Use Pest syntax consistently for new and refactored tests.
+- Use named HTTP assertions, not raw numeric status checks.
+- Prefer Laravel fakes for framework integrations (events, mail, queue, notifications).
+- Keep browser-test constraints aligned with Dusk guidance.
+- Never delete tests without explicit approval.
 
 ## Examples
 
@@ -104,6 +118,44 @@ arch('controllers have the correct suffix')
     ->expect('App\Http\Controllers')
     ->toHaveSuffix('Controller');
 ```
+
+```php
+// Browser test baseline with Dusk + DatabaseTruncation
+uses(\Illuminate\Foundation\Testing\DatabaseTruncation::class);
+
+it('submits invoice flow in browser', function () {
+    $this->browse(function (Browser $browser) {
+        $browser->visit('/invoices/create')
+            ->assertNoJavaScriptErrors()
+            ->waitFor('@submit-button');
+    });
+});
+```
+
+## Run Commands
+
+```bash
+# Run all tests through Laravel
+php artisan test
+
+# Run Pest directly
+vendor/bin/pest
+
+# Run a specific file
+vendor/bin/pest tests/Feature/InvoiceControllerTest.php
+
+# Filter by test name/description
+vendor/bin/pest --filter="creates an invoice"
+
+# Run a focused group (if groups are configured)
+vendor/bin/pest --group=feature
+```
+
+## Testing Guidance
+
+- Keep tests behavior-focused and easy to read at a glance.
+- Use datasets and `beforeEach()` to reduce duplication before adding new assertions.
+- For browser behavior, defer selector/waiting details to `Dusk/SKILL.md`.
 
 ## Anti-Patterns
 

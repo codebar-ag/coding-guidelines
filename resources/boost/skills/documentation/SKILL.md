@@ -5,17 +5,14 @@ description: Keep README, guidelines, and feature documentation in sync with the
 
 # Documentation
 
-**Name:** Documentation  
-**Description:** Keep README, guidelines, and feature documentation in sync with the actual behaviour of the codebase, focusing on behaviour, examples, and how to apply the skills in practice.  
-**Compatible Agents:** documentation, general-purpose, review  
-**Tags:** docs, readme, guides, how-to, behaviour, examples
-
 ## When to Apply
 
 - After implementing or refactoring a feature with **BackendImplementationAgent**, **FrontendImplementationAgent**, or **ImplementationAgent**.
 - When the behaviour of a public API endpoint, console command, job, or user-facing screen changes.
 - When adding a new pattern, skill, or workflow that other developers should follow.
 - When onboarding material (`README.md`, `RULES.md`, or top-level docs) is out of date with current behaviour.
+- Do not apply for internal refactors with no observable behavior change.
+- Do not finalize public docs for draft designs that are not implemented yet.
 
 ## Preconditions
 
@@ -39,6 +36,13 @@ description: Keep README, guidelines, and feature documentation in sync with the
   - Project-wide rules or patterns: `RULES.md`.
   - Skill- or pattern-specific: the corresponding `resources/boost/skills/**/SKILL.md`.
   - Feature-specific: the closest existing doc file or a new one in the project’s docs area.
+
+### Scope Rule: Skill Docs vs Feature Docs
+
+- Update a skill doc when the change defines a reusable rule, pattern, checklist, or anti-pattern.
+- Update a feature doc when the change describes one module, endpoint, UI flow, or operator workflow.
+- If both changed: put normative guidance in the skill doc, and put concrete behavior in the feature doc.
+- Do not duplicate full feature walkthroughs inside `resources/boost/skills/**/SKILL.md`.
 
 ### 2. Update or Create Documentation
 
@@ -66,6 +70,8 @@ description: Keep README, guidelines, and feature documentation in sync with the
 
 ### 4. Validate Against the Code
 
+- Treat code and tests as source of truth, not existing docs.
+- Verify behavior directly in routes, controllers, form requests, resources, jobs, and tests.
 - Cross-check that the documentation matches the **current**:
   - Route names, HTTP methods, and URIs.
   - Request fields and validation rules.
@@ -75,12 +81,27 @@ description: Keep README, guidelines, and feature documentation in sync with the
   - Prefer reading the code or tests over guessing.
   - If truly ambiguous, explicitly call it out as “behaviour depends on …” instead of inventing details.
 
+### Conflict Resolution: Docs vs Code
+
+- When docs and code disagree, update docs to match current code/tests in the same change set.
+- If code is wrong but docs are right, open/fix code first; do not document intended behavior as if implemented.
+- If behavior is intentionally changing, merge docs and code together to avoid stale guidance windows.
+- Never keep conflicting statements across `README.md`, `RULES.md`, and skill docs after merge.
+
 ### 5. Keep Changelogs and History Manageable
 
 - Avoid narrating every refactor; focus on **observable behaviour** and how to use the system.
 - When behaviour is intentionally changed:
   - Update the documentation as if it had always been correct.
   - Use commit messages or PR descriptions for historical context, not the docs themselves.
+
+### 6. Report Documentation Changes Clearly
+
+- Use this concise handoff format:
+  - **Area**: `[feature / module / onboarding]`
+  - **Docs touched**: `[README.md, RULES.md, path/to/doc.md]`
+  - **Behavior updates**: `[what changed for users/developers]`
+  - **Follow-ups**: `[larger docs or diagrams tracked separately]`
 
 ## Checklists
 
@@ -97,6 +118,7 @@ description: Keep README, guidelines, and feature documentation in sync with the
 - [ ] Summarized what changed in the docs (scope, files, and key points).
 - [ ] Highlighted any new patterns or skills authors should follow.
 - [ ] Noted any follow-up documentation that should be tackled separately (for example, larger guides or diagrams).
+- [ ] Included Area/Docs touched/Behavior updates/Follow-ups in the handoff note.
 
 ## Safety / Things to Avoid
 
@@ -105,14 +127,33 @@ description: Keep README, guidelines, and feature documentation in sync with the
 - Do **not** invent behaviour that does not exist in the code or tests.
 - Do **not** mix unrelated documentation changes into the same batch; keep diffs focused on the current feature or area.
 
-## Example Summary Format
+## Examples
 
-When reporting documentation work back to the team, use a concise structure like:
+```md
+## Invoice retry endpoint
 
-- **Area**: `[feature / module / onboarding]`.
-- **Docs touched**: `[README.md, RULES.md, path/to/feature-doc.md]`.
-- **Changes**:
-  - Updated behaviour for `[endpoint / screen / command]`.
-  - Added examples for `[common task or workflow]`.
-- **Follow-ups**: `[optional longer-form guides, diagrams, or cross-links to add later]`.
+Use `POST /api/invoices/{invoice}/retry` when retrying a failed payment.
+Requires authenticated admin user.
+
+Success: returns `202` and dispatches `RetryInvoicePaymentJob`.
+Failure: returns `409` when invoice status is not `failed`.
+```
+
+```md
+## Frontend: Invoice list filter
+
+Use query param `status` on `GET /invoices` to pre-filter the Blade view.
+
+Example:
+- `/invoices?status=failed` shows only failed invoices.
+
+Livewire component `InvoiceTable` reads `status` from the request and applies the filter on initial render.
+```
+
+## References
+
+- `README.md`: onboarding and high-level behavior only
+- `RULES.md`: project-wide conventions and decision rules
+- `resources/boost/skills/**/SKILL.md`: reusable implementation guidance (not feature walkthroughs)
+- Feature docs in project docs area: module-specific behavior, examples, and operational notes
 

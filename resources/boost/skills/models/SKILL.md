@@ -10,22 +10,23 @@ compatible_agents:
 
 # Models
 
-**Name:** Models  
-**Description:** Eloquent model conventions covering mass assignment, casts, relationships, section headers, and activity logging. Every model must follow these structural rules.  
-**Compatible Agents:** general-purpose, backend  
-**Tags:** app/Models/**/*.php, laravel, php, backend, eloquent, model, database
-
 ## When to Apply
 
 - When creating a new Eloquent model in `app/Models/`.
 - When refactoring existing models to align with mass-assignment, casting, and logging conventions.
 - When reviewing models for consistency in relationships, helpers, and activity logging.
 
+## When NOT to Apply
+
+- For DTOs, value objects, and classes that are not persisted with Eloquent.
+- For pivot-only structures that do not use a dedicated business model.
+
 ## Preconditions
 
 - Laravel application and Eloquent are configured.
 - Database schema and migrations for the model’s table exist or are being designed.
 - `spatie/laravel-activitylog` is installed and configured for activity logging.
+- "Business models" means models representing core domain records with audit value (for example invoices, orders, payments). Apply `LogsActivity` to these models by default.
 
 ## Process
 
@@ -57,6 +58,7 @@ compatible_agents:
 
 - Create a corresponding factory for every model under `database/factories/`.
 - Ensure factories cover required attributes and common state variants.
+- Prefer explicit factory states for common statuses (`->draft()`, `->paid()`, `->archived()`) to match model helpers.
 
 ## Examples
 
@@ -135,6 +137,7 @@ class Invoice extends Model
 - Omitting return types on relationship methods.
 - Creating a model without a corresponding factory.
 - Putting complex business logic directly in the model — prefer Actions or Services.
+- Defining model shape with `protected array $fillable = ['name'];` and `protected array $casts = ['status' => 'string'];` instead of `$guarded = []` and `casts()`
 
 ## References
 

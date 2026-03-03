@@ -8,10 +8,33 @@ compatible_agents:
   - review
 ---
 
-**Name:** Interfaces & Contracts
-**Description:** Contracts defining the shape a class must conform to. Used for decoupling dependent classes from concrete implementations, enabling multiple implementations and easier testing.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Contracts/**/*.php, laravel, php, backend, interface, contract, dependency-inversion
+# Interfaces & Contracts
+
+## When to Use
+
+- You have (or realistically expect) multiple implementations.
+- Consumers should depend on capabilities, not implementation details.
+- You need easy test substitution via container binding.
+
+## When Not to Use
+
+- A class has one stable implementation with no likely alternatives.
+- An interface adds indirection but no flexibility.
+- A team is creating interfaces by default for every class.
+
+## Preconditions
+
+- Laravel project uses container bindings and constructor injection.
+- `app/Contracts/` is the canonical location for application contracts.
+- A service provider (typically `AppServiceProvider`) is available for bindings.
+
+## Process
+
+1. Identify a capability that needs multiple implementations.
+2. Extract a capability-based interface in `app/Contracts/`.
+3. Implement the contract in one or more concrete classes.
+4. Bind the interface to a default implementation in a service provider.
+5. Type-hint the interface in consumers and swap bindings in tests.
 
 ## Rules
 
@@ -84,13 +107,22 @@ class ChargePaymentMethod
 $this->app->bind(PaymentGateway::class, FakePaymentGateway::class);
 ```
 
+## Checklist
+
+- [ ] Interface name reflects capability (`PaymentGateway`, not `PaymentGatewayInterface`).
+- [ ] Contract contains signatures only (no implementation/state).
+- [ ] Consumer classes type-hint the interface.
+- [ ] Concrete classes implement every method from the contract.
+- [ ] Service provider binding exists for runtime resolution.
+- [ ] Tests can swap the contract binding to fake/stub implementations.
+
 ## Anti-Patterns
 
-- Creating an interface for every class by default — only add interfaces where they provide real decoupling
-- Creating an interface when there is only one implementation and no realistic chance of another
-- Adding default implementations to an interface (use an abstract class instead)
-- Adding constants specific to one implementation (keep in the concrete class)
-- Type-hinting the concrete class instead of the interface in consumers
+- Creating an interface for every class by default — adds indirection and cognitive overhead without value.
+- Creating an interface with one implementation and no realistic alternative — increases maintenance cost with no gain.
+- Adding default implementations to an interface — violates contract-only intent; use an abstract class if needed.
+- Adding constants specific to one implementation — leaks implementation details into the contract.
+- Type-hinting concrete classes in consumers — prevents easy swapping and weakens dependency inversion.
 
 ## References
 

@@ -7,23 +7,42 @@ compatible_agents:
   - review
 ---
 
-**Name:** Livewire Components
-**Description:** Laravel Livewire conventions for building interactive UI without custom JavaScript. Components are PHP classes with reactive properties, computed properties, and event dispatching.
-**Compatible Agents:** general-purpose, frontend
-**Tags:** app/Livewire/**/*.php, resources/views/livewire/**/*.blade.php, laravel, php, frontend, livewire, interactive
+# Livewire Components
+
+## When to Use
+
+- Building server-driven interactive UI with moderate complexity.
+- Replacing jQuery/inline JS patterns with PHP-first reactive components.
+- Creating forms, filters, paginated lists, and interactive CRUD flows.
+
+## When Not to Use
+
+- Fully client-heavy SPAs with complex offline/local state synchronization.
+- Static pages without meaningful interactivity.
+- Cross-team frontend architectures that already mandate a JS SPA stack.
+
+## Preconditions
+
+- `livewire/livewire` is installed and configured in the Laravel app.
+- App layouts include Livewire scripts/styles as required by the project version.
+- Component namespaces/paths follow project conventions (`app/Livewire`, `resources/views/livewire`).
+- Validation, authorization, and domain actions are available for delegated business logic.
+
+## Process Checklist
+
+- [ ] Confirm the feature has one clear interactive responsibility.
+- [ ] Keep domain/business logic in Actions/Services, not directly in UI methods.
+- [ ] Use reactive public properties with explicit typing where practical.
+- [ ] Use `#[Computed]` for derived values and avoid repeated query logic.
+- [ ] Prefer `wire:model.live` or `wire:model.lazy` intentionally based on UX needs.
+- [ ] Extract form objects and child components when complexity grows.
 
 ## Rules
 
-- Use **Livewire** for all interactive UI — no custom JavaScript unless absolutely necessary
-- Follow existing Livewire component patterns in the project
-- Keep component logic in the PHP class; keep Blade templates declarative
-- One Livewire component per feature/concern
-- Use public properties for reactive data
-- Use computed properties (`#[Computed]`) for derived data
-- Use `wire:model` for two-way binding, `wire:click` for actions
-- Keep components small and focused — extract sub-components when they grow
-- Use form objects (`Livewire\Form`) for complex form handling
-- Dispatch events for cross-component communication
+- Keep component logic in the PHP class and templates declarative.
+- Use one component per feature concern; split when responsibilities diverge.
+- Use computed properties for derived/read models.
+- Use events for cross-component coordination instead of tight coupling.
 
 ## Examples
 
@@ -105,6 +124,12 @@ $this->dispatch('invoice-created', invoiceId: $invoice->id);
 #[On('invoice-created')]
 public function refreshList(int $invoiceId): void { ... }
 ```
+
+## Testing Guidance
+
+- Use Livewire component tests for state transitions, validation, and emitted events.
+- Add feature tests around critical rendered output and authorization constraints.
+- Verify pagination, filters, and form submissions in at least one happy-path and one failure-path test.
 
 ## Anti-Patterns
 

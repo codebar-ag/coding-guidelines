@@ -7,22 +7,43 @@ compatible_agents:
   - review
 ---
 
-**Name:** Tailwind CSS
-**Description:** Tailwind CSS v4 styling conventions. Use when working with CSS, Tailwind utilities, or customizing the theme in Laravel projects.
-**Compatible Agents:** general-purpose, frontend
-**Tags:** resources/css/**/*.css, laravel, tailwind, css, vite, styling
+# Tailwind CSS
+
+## When to Use
+
+- Building or refactoring user-facing styles in Blade and Livewire templates.
+- Implementing a design handoff with utility-first classes.
+- Updating theme tokens and scales in `resources/css/app.css`.
+- Standardizing responsive and dark mode behavior across components.
+
+## When Not to Use
+
+- Defining business logic or presentation flow (use Blade/Livewire skills).
+- Building a fully separate design system process (defer to `Design/SKILL.md`).
+- Creating one-off inline style overrides when a reusable utility composition is possible.
+
+## Preconditions
+
+- Tailwind v4 is installed and imported in `resources/css/app.css`.
+- Vite is configured with `@tailwindcss/vite`.
+- `@source` directives include relevant Blade/Livewire paths.
+- The main CSS entrypoint is referenced by Vite in the app layout.
+
+## Process Checklist
+
+- [ ] Confirm Tailwind build setup works (`npm run dev` or `npm run build` succeeds).
+- [ ] Implement styles with utility classes in markup, not custom class selectors.
+- [ ] Use `@theme` for tokens (colors, fonts, spacing) instead of hardcoded duplicates.
+- [ ] Add responsive variants (`sm:`, `md:`, `lg:`) where layout changes by viewport.
+- [ ] Add `dark:` variants where dark mode behavior is required.
+- [ ] Extract repeated utility groups into Blade components when class strings get long.
 
 ## Rules
 
-- **Tailwind CSS v4** utility classes only — no custom CSS classes
-- Theme customization via `@theme` directive in `resources/css/app.css`
-- Do not create custom `.css` class selectors — compose utilities in markup instead
-- Vite is the build tool with `@tailwindcss/vite` plugin
-- Entry point: `resources/css/app.css`
-- Use `@source` directive to include Blade and Livewire paths for class scanning
-- Use responsive prefixes (`sm:`, `md:`, `lg:`) for responsive design
-- Use dark mode variant (`dark:`) when dark mode is supported
-- Extract Blade components for complex repeated utility patterns — keep utility strings readable
+- Tailwind utility classes only; avoid custom `.css` class selectors.
+- Theme customization belongs in `@theme` within `resources/css/app.css`.
+- Keep utility composition in markup and components, not in ad-hoc CSS files.
+- Keep class scanning paths accurate via `@source` directives.
 
 ## Examples
 
@@ -41,18 +62,29 @@ compatible_agents:
 ```
 
 ```blade
-{{-- Compose utilities in markup — no custom CSS classes --}}
+{{-- Compose utilities in markup --}}
 <div class="rounded-lg shadow-sm p-4 sm:p-6 lg:p-8 transition ease-in-out duration-150">
     <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Title</h2>
 </div>
 ```
 
 ```blade
-{{-- Extract complex patterns to components — avoid long utility strings in views --}}
+{{-- Before: long repeated utility strings across views --}}
+<button class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60">
+    Save
+</button>
+
+{{-- After: extract to a reusable component --}}
 <x-card class="p-4">
     {{ $slot }}
 </x-card>
 ```
+
+## Testing Guidance
+
+- Run `npm run build` after style/token changes to catch invalid Tailwind usage.
+- Validate responsive breakpoints and dark mode manually in browser devtools.
+- For reusable components, verify class output in at least one feature/UI test path.
 
 ## Anti-Patterns
 
@@ -62,6 +94,12 @@ compatible_agents:
 - Missing `@source` directives for Blade/Livewire paths (classes won't be scanned)
 - Not using responsive prefixes when layout changes by viewport
 - Hardcoding colors instead of using theme variables via `@theme`
+
+### Common Pitfalls
+
+- Purge/scanning misses because new template paths were not added to `@source`.
+- Utility conflicts caused by copying legacy classes instead of using shared components.
+- Theme drift from adding raw hex values in templates instead of token variables.
 
 ## References
 

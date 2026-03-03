@@ -51,7 +51,7 @@ final class ValidateSkillsCommand extends Command
         $finder = new Finder;
         $finder->files()->in($skillsRoot)->name('SKILL.md');
 
-        $model = (string) ($this->option('model') ?: env('ANTHROPIC_MODEL', 'claude-3-5-sonnet@20240620'));
+        $model = (string) ($this->option('model') ?: env('ANTHROPIC_MODEL', 'claude-haiku-4-5'));
         $runSync = (bool) $this->option('sync');
 
         foreach ($finder as $file) {

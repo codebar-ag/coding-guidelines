@@ -7,22 +7,43 @@ compatible_agents:
   - review
 ---
 
-**Name:** Resources
-**Description:** API resource classes that transform Eloquent models into JSON-ready arrays. Resources control exactly what is exposed in API responses and handle relationships, conditional attributes, and date formatting.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Http/Resources/**/*.php, laravel, php, backend, api, resource, json, response
+# Resources
 
-## Rules
+## When to Apply
 
-- Resource classes live in `app/Http/Resources/`
-- Single resource: `ModelResource` → `UserResource`, `PostResource`
-- Collection resource: `ModelCollection` → `UserCollection`, `PostCollection`
-- Only expose what the API consumer needs — never blindly expose every model attribute
-- Use `whenLoaded()` for related resources — never eager load inside the resource itself
-- Use `when()`, `whenHas()`, or `whenNotNull()` for conditional attributes — not `if` statements in the array
-- Use `mergeWhen()` for multiple attributes sharing the same condition
-- Use `UserResource::collection()` for simple collections — only create a dedicated collection class when custom meta is needed
-- Do not add pagination meta manually — pass a paginator directly and let Laravel append it
+- Apply when API endpoints return Eloquent models or model collections as JSON.
+- Apply when response fields must be explicitly whitelisted and conditionally included.
+- Do not use for internal CLI output, file downloads, binary responses, or non-JSON rendering.
+
+## Preconditions
+
+- Resource classes can be created in `app/Http/Resources/`.
+- Models and required relationships are loaded before resource transformation.
+- Controller/service owns query execution; resource owns serialization only.
+
+## Process
+
+### 1. Create the Appropriate Resource Type
+
+- Use `ModelResource` (for example `UserResource`) for single entities.
+- Use `UserResource::collection(...)` for simple lists.
+- Create a dedicated `ResourceCollection` only when custom top-level meta is required.
+
+### 2. Build a Safe `toArray()` Contract
+
+- Expose only fields needed by API consumers.
+- Use `whenLoaded()` for relationships.
+- Use `when()`, `whenHas()`, `whenNotNull()`, and `mergeWhen()` for conditional fields.
+
+### 3. Keep Loading and Queries Outside Resources
+
+- Eager-load in controllers/services before passing models to resources.
+- Never trigger additional queries inside `toArray()`.
+
+### 4. Verify Response Shape
+
+- Check pagination and links by returning paginator instances directly.
+- Confirm role/permission-based fields are hidden for unauthorized users.
 
 ## Examples
 
@@ -45,7 +66,7 @@ class UserResource extends JsonResource
 ```
 
 ```php
-// Controller — eager load before passing to resource
+// Critical: eager-load in controller before passing to resource.
 return UserResource::collection(User::with('posts')->paginate());
 ```
 
@@ -63,10 +84,18 @@ class UserCollection extends ResourceCollection
 }
 ```
 
+## Checklists
+
+- [ ] Resource exposes only required public API fields.
+- [ ] Relationships are eager-loaded before resource transformation.
+- [ ] `toArray()` has no DB queries or lazy-load triggers.
+- [ ] Conditional fields use `when*` helpers.
+- [ ] Pagination meta is framework-provided, not manually duplicated.
+
 ## Anti-Patterns
 
 - Exposing all model attributes without whitelisting
-- Eager loading relationships inside the resource's `toArray()` — load them in the controller
+- Eager/lazy loading relationships inside `toArray()` (causes N+1 query issues)
 - Using `if` statements inside the response array instead of `when()`, `whenLoaded()`, `whenNotNull()`
 - Creating a dedicated collection class just for a simple list (use `UserResource::collection()`)
 - Putting business logic or database queries in a resource
@@ -75,5 +104,5 @@ class UserCollection extends ResourceCollection
 ## References
 
 - [Laravel API Resources](https://laravel.com/docs/eloquent-resources)
-- Related: `Controllers/SKILL.md` — eager loading is done in the controller
-- Related: `Helpers/SKILL.md` — use `DateHelper::format()` for date formatting
+- `resources/boost/skills/controllers/SKILL.md` (query/loading responsibilities)
+- `resources/boost/skills/helpers/SKILL.md` (formatting helpers used in resources)

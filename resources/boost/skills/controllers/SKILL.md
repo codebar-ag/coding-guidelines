@@ -9,11 +9,6 @@ compatible_agents:
 
 # Controllers
 
-**Name:** Controllers  
-**Description:** Thin HTTP entry points that validate input, delegate to Actions or Services, and return a response. Controllers contain no business logic.  
-**Compatible Agents:** general-purpose, backend  
-**Tags:** app/Http/Controllers/**/*.php, laravel, php, backend, controller, http, request-response
-
 ## When to Apply
 
 - When creating or refactoring HTTP endpoints in `app/Http/Controllers/**`.
@@ -23,9 +18,10 @@ compatible_agents:
 
 ## Preconditions
 
-- The Laravel routing and controller setup is in place (`routes/web.php`, `routes/api.php`).
-- Related Actions, Services, Jobs, Policies, and Form Requests exist or have clear designs.
-- The project conventions for API vs web controllers (JSON vs views) are understood.
+- **Required:** Routing and controller setup exists (`routes/web.php`, `routes/api.php`).
+- **Required:** Validation and authorization paths are defined (Form Requests, policies, or middleware).
+- **Recommended:** Actions/Services for business logic are implemented before wiring the endpoint.
+- **Recommended:** API/web response conventions (JSON vs views) are documented for the project.
 
 ## Process
 
@@ -61,9 +57,15 @@ compatible_agents:
 - For API controllers:
   - Return JSON responses (e.g., `JsonResponse` or `Resource` / `ResourceCollection`).
   - Use appropriate HTTP status codes: 200, 201, 204, 403, 404, 422, etc.
+  - Use explicit `JsonResponse` when status/header control matters; otherwise Laravel response casting is acceptable for simple payloads.
 - For web controllers:
   - Return views or redirects, not JSON.
   - Keep view data preparation simple and delegated where possible.
+
+### 5. Keep Controllers Testable
+
+- Thin controllers push logic and most assertions into Action/Service tests.
+- Controller tests should focus on HTTP contract: validation, authorization, status code, and response shape.
 
 ## Examples
 
@@ -73,8 +75,9 @@ class StoreInvoiceController extends Controller
 {
     public function __invoke(StoreInvoiceRequest $request, CreateInvoice $action): JsonResponse
     {
-        $order = Order::findOrFail($request->validated('order_id'));
-        $invoice = $action->execute($order);
+        $invoice = $action->execute(
+            orderId: (int) $request->validated('order_id'),
+        );
 
         return new JsonResponse(new InvoiceResource($invoice), 201);
     }
@@ -87,15 +90,15 @@ class InvoiceController extends Controller
 {
     public function index(): JsonResponse
     {
-        return new JsonResponse(InvoiceResource::collection(Invoice::paginate()));
+        // Explicit JsonResponse keeps status/header behavior clear for API controllers.
+        return new JsonResponse(InvoiceResource::collection(Invoice::paginate()), 200);
     }
 
     public function store(StoreInvoiceRequest $request, CreateInvoice $action): JsonResponse
     {
         $this->authorize('create', Invoice::class);
 
-        $order = Order::findOrFail($request->validated('order_id'));
-        $invoice = $action->execute($order);
+        $invoice = $action->execute(orderId: (int) $request->validated('order_id'));
 
         return new JsonResponse(new InvoiceResource($invoice), 201);
     }
@@ -132,6 +135,6 @@ class InvoiceController extends Controller
 ## References
 
 - [Laravel Controllers](https://laravel.com/docs/controllers)
+- Related (read first): `Actions/SKILL.md` — the delegation pattern used by thin controllers
 - Related: `FormRequests/SKILL.md` — all input validation
-- Related: `Actions/SKILL.md` — the business logic controllers delegate to
 - Related: `Policies/SKILL.md` — authorization enforced in controllers

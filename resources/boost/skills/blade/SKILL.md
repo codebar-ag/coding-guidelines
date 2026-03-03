@@ -7,23 +7,44 @@ compatible_agents:
   - review
 ---
 
-**Name:** Blade Templates
-**Description:** Laravel Blade template conventions covering components, output escaping, security, structure, and formatting.
-**Compatible Agents:** general-purpose, frontend
-**Tags:** resources/views/**/*.blade.php, laravel, php, frontend, blade, template, html
+# Blade Templates
+
+## When to Use
+
+- Creating or refactoring server-rendered view templates in `resources/views/`.
+- Building reusable UI fragments with Blade components.
+- Rendering validated/authorized data from controllers, Livewire, and view models.
+
+## When Not to Use
+
+- Complex stateful interactions that should live in Livewire components.
+- Heavy client-side application flows that require a dedicated SPA framework.
+- Raw PHP templating where Blade directives provide clearer intent.
+
+## Preconditions
+
+- Laravel Blade is enabled (default Laravel app setup).
+- If `x-*` Alpine directives are used, Alpine is loaded by the frontend build/layout.
+- If `wire:*` directives are used, Livewire is installed and version-compatible.
+- Data passed to views is already validated and authorized upstream.
+
+## Process Checklist
+
+- [ ] Decide whether this should be plain Blade, a Blade component, or Livewire.
+- [ ] Keep markup declarative and move reusable blocks into components.
+- [ ] Render user-provided values with `{{ }}` by default.
+- [ ] Use `{!! !!}` only for trusted, pre-sanitized HTML.
+- [ ] Keep scripts/styles out of Blade files unless explicitly required by framework conventions.
+- [ ] Ensure text and labeling follow project language/content standards.
 
 ## Rules
 
-- Use Blade components (`<x-component>`) for reusable UI pieces
-- Prefer anonymous components for simple, presentation-only elements
-- Use class-based components when logic is needed
-- Use `{{ }}` for escaped output (default) — never output raw user input unescaped
-- Use `{!! !!}` only when the content is explicitly safe (e.g., pre-sanitized HTML)
-- No inline `<style>` tags in Blade files
-- No inline `<script>` tags in Blade files — use Livewire or Alpine.js via Blade directives
-- Keep all user-facing text in English
-- Indent Blade directives consistently (4 spaces)
-- Use short attribute syntax where supported: `@class`, `@style`
+- Use Blade components (`<x-component>`) for reusable UI.
+- Prefer anonymous components for presentation-only pieces.
+- Use class-based components when logic/DI is required.
+- Use escaped output (`{{ }}`) by default.
+- Avoid inline `<style>` and `<script>` tags in Blade templates.
+- Use helper directives like `@class` and `@style` for conditional attributes.
 
 ## Examples
 
@@ -61,6 +82,35 @@ compatible_agents:
     <div x-show="open">Content</div>
 </div>
 ```
+
+```blade
+{{-- Workflow example: convert repeated form markup into a component --}}
+{{-- Step 1: Before --}}
+<label for="email">Email</label>
+<input id="email" name="email" type="email" value="{{ old('email', $user->email) }}">
+@error('email') <p>{{ $message }}</p> @enderror
+
+{{-- Step 2: After --}}
+<x-form.input
+    name="email"
+    type="email"
+    label="Email"
+    :value="old('email', $user->email)"
+/>
+```
+
+## Security Checklist
+
+- [ ] User-controlled output uses `{{ }}` (escaped) and not raw output.
+- [ ] Any `{!! !!}` usage is documented as sanitized/trusted.
+- [ ] No inline scripts/styles that bypass normal frontend safeguards.
+- [ ] Conditional attributes/classes do not expose sensitive state unintentionally.
+
+## Testing Guidance
+
+- Add/adjust feature tests for view-level behavior (form errors, conditional blocks, auth gating).
+- Add component tests (or focused feature coverage) for reusable Blade components.
+- Validate escaping behavior in tests when rendering user-provided content.
 
 ## Anti-Patterns
 

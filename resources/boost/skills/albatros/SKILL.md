@@ -8,16 +8,26 @@ compatible_agents:
   - review
 ---
 
-**Name:** Albatros API Integration
-**Description:** Albatros accounting API integration via Saloon. Use when working with app/Services/Albatros/, AlbatrosConnector, or Albatros DTOs.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Services/Albatros/**/*.php, albatros, accounting, saloon, api-integration
+# Albatros API Integration
+
+## When to Use
+
+- You are integrating with the Albatros accounting API specifically.
+- You are editing `app/Services/Albatros/`, its connector, requests, or DTO mapping.
+- You need typed DTO responses, pagination support, and cached reference data.
+
+## When Not to Use
+
+- The integration target is not Albatros (use the generic integration/service skills instead).
+- The operation is local business logic with no external API call.
+- You need one-off scripts without reusable connector/request architecture.
 
 ## Rules
 
 - `AlbatrosConnector` extends `Saloon\Http\Connector`
 - Token-based authentication with Mandant header
 - Base URL from `config('albatros.base_url')`
+- Keep credentials and Mandant values in `.env`, mapped through `config/albatros.php`; never hardcode secrets.
 - `AlbatrosService` wraps all API calls and returns typed DTOs or `Collection` of DTOs
 - Use `Cache` for reference data (addresses, accounts, VAT codes, etc.)
 - Paginated endpoints use `fetchAllPages()` helper with `lastIndex` parameter
@@ -29,6 +39,11 @@ compatible_agents:
 - Handle API field name casing variations in `fromArray()`
 - Cache reference data to minimize API calls
 - Use `clearCache()` method when data needs refreshing
+- Scope cache keys by Mandant to avoid cross-tenant contamination
+- Fail fast on non-success responses and use retries only for transient errors (timeouts/429/5xx)
+- In `fetchAllPages()`, document and keep retry/backoff explicit (attempts + delay) for predictable operations.
+- Treat empty-string `lastIndex` as the stop sentinel unless API docs specify a different terminal token.
+- Normalize response shape at service boundary (for example `items` + `lastIndex`) before DTO mapping.
 - All monetary values as `decimal:2`
 
 ## Examples
@@ -107,15 +122,65 @@ readonly class AdresseData
 // Service with caching
 public function getAdressen(): Collection
 {
-    return Cache::remember('albatros.adressen', 3600, fn () =>
+    return Cache::remember($this->cacheKey('adressen'), 3600, fn () =>
         $this->fetchAllPages(fn ($lastIndex) => new ListAdressenRequest(lastIndex: $lastIndex))
     );
 }
 
 public function clearCache(): void
 {
-    Cache::forget('albatros.adressen');
+    Cache::forget($this->cacheKey('adressen'));
 }
+```
+
+```php
+// Service pagination + error handling pattern
+use Illuminate\Support\Collection;
+use Saloon\Exceptions\Request\RequestException;
+
+private function fetchAllPages(callable $requestFactory): Collection
+{
+    $all = collect();
+    $lastIndex = '';
+
+    do {
+        $response = retry(3, function () use ($requestFactory, $lastIndex) {
+            return $this->connector->send($requestFactory($lastIndex));
+        }, 200);
+
+        if (! $response->successful()) {
+            throw new RequestException($response, 'Albatros request failed.');
+        }
+
+        $payload = $response->json();
+        $items = collect($payload['items'] ?? []);
+        $all = $all->merge($items->map(fn (array $row) => AdresseData::fromArray($row)));
+        $lastIndex = (string) ($payload['lastIndex'] ?? '');
+    } while ($lastIndex !== '');
+
+    return $all;
+}
+
+private function cacheKey(string $segment): string
+{
+    return sprintf('albatros.%s.%s', config('albatros.mandant'), $segment);
+}
+```
+
+```php
+// Minimal config/albatros.php pattern
+return [
+    'base_url' => env('ALBATROS_BASE_URL'),
+    'mandant' => env('ALBATROS_MANDANT'),
+    'token' => env('ALBATROS_TOKEN'),
+];
+```
+
+```php
+// Mocked Saloon test note (no real API calls)
+Saloon::fake([
+    '*' => MockResponse::make(['items' => [], 'lastIndex' => ''], 200),
+]);
 ```
 
 ## Anti-Patterns
@@ -126,6 +191,7 @@ public function clearCache(): void
 - Not handling API field name casing variations in `fromArray()`
 - Storing monetary values as float or string instead of `decimal:2`
 - Forgetting to call `clearCache()` when reference data is updated
+- Reusing non-Mandant-specific cache keys across Mandant contexts
 
 ## References
 

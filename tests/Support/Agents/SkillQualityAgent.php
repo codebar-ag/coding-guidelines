@@ -36,6 +36,10 @@ CONTENT (typically warnings if weak)
 TONE & QUALITY (improvements / warnings)
 - Clear, concise, specific to this skill.
 - No obvious contradictions or copy-paste artifacts from unrelated skills.
+- Do not duplicate the same point across `warnings` and `improvements`.
+- Prioritize by severity: structural blockers first, then highest-impact clarity issues.
+- Keep output high signal: maximum 5 warnings and 5 improvements.
+- Every warning/improvement must be concrete and actionable for this exact file.
 
 Return a strict JSON object with this exact shape:
 {

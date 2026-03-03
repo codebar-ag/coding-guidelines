@@ -8,10 +8,19 @@ compatible_agents:
   - review
 ---
 
-**Name:** Policies
-**Description:** Centralised authorization logic for a given Eloquent model. Policies define per-ability access control and are enforced at the controller level.
-**Compatible Agents:** general-purpose, backend
-**Tags:** app/Policies/**/*.php, laravel, php, backend, policy, authorization, auth
+# Policies
+
+## When to Apply
+
+- When adding a new model that needs authorization rules.
+- When refactoring inline authorization out of controllers or Form Requests.
+- When standardizing ability names and access decisions across endpoints.
+
+## Separation of Concerns
+
+- Policies answer **who can do what**.
+- Actions/Services execute **what happens next** after authorization passes.
+- Keep these responsibilities separate to avoid mixing access logic with business workflows.
 
 ## Rules
 
@@ -21,6 +30,7 @@ compatible_agents:
 - Create one policy for **each** model
 - Define one method per ability — use standard names: `viewAny`, `view`, `create`, `update`, `delete`, `restore`, `forceDelete`
 - Always enforce authorization at the **controller** level — never inside actions or services
+- Route middleware `can:*` is equivalent enforcement to calling `$this->authorize()` in controllers
 - Laravel auto-discovers policies that follow the `ModelPolicy` naming convention
 - For custom locations, register manually in `AuthServiceProvider`
 
@@ -75,10 +85,23 @@ public function authorize(): bool
     return $this->user()->can('update', $this->route('invoice'));
 }
 
+// Safe always-true example (explicitly public endpoint)
+public function authorize(): bool
+{
+    // Intentionally public route: no model-sensitive data is exposed.
+    return true;
+}
+
 // Usage via route middleware
 Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])
     ->middleware('can:update,invoice');
 ```
+
+## Testing Guidance
+
+- Test each policy method in isolation with explicit user/model fixtures.
+- Cover allow and deny paths for each ability.
+- Keep tests focused on authorization decisions, not side effects.
 
 ## Anti-Patterns
 

@@ -7,23 +7,42 @@ compatible_agents:
   - review
 ---
 
-**Name:** Dusk (Browser Testing)
-**Description:** End-to-end browser testing with Laravel Dusk. Used exclusively for full user flows requiring a real Chrome browser — JavaScript interactions, multi-step forms, and visual assertions.
-**Compatible Agents:** general-purpose, testing
-**Tags:** tests/Browser/**/*.php, laravel, php, testing, dusk, browser, e2e, end-to-end
+# Dusk (Browser Testing)
+
+## When to Use
+
+- End-to-end flows requiring a real browser and JavaScript execution.
+- Multi-step forms, modal interactions, and client-side validation states.
+- Regression testing for key UI journeys before release.
+
+## When Not to Use
+
+- Unit-level business logic validation (use unit tests).
+- Controller/API contract validation without browser behavior (use feature/API tests).
+- Fast feedback checks where browser startup cost is unnecessary.
+
+## Preconditions
+
+- Laravel Dusk is installed and browser tests run from `tests/Browser/`.
+- Chrome/Chromium and compatible driver are available on the test environment.
+- `.env.dusk.local` is configured with isolated test DB and app URL.
+- Test data setup strategy uses `DatabaseTruncation` or `DatabaseMigrations`, never `RefreshDatabase`.
+
+## Process Checklist
+
+- [ ] Choose Dusk only if browser execution is required.
+- [ ] Add/verify `dusk=""` selectors for all interactive elements under test.
+- [ ] Use `loginAs()` to bypass repetitive auth UI unless auth flow is under test.
+- [ ] Replace arbitrary waits with `waitFor*` assertions.
+- [ ] Call `assertNoJavaScriptErrors()` after each `visit()`.
+- [ ] Extract repeated navigation/selectors into Page Objects or Dusk Components.
 
 ## Rules
 
-- Browser tests live in `tests/Browser/`
-- Use Dusk only where a real browser interaction is required (JavaScript, multi-step flows)
-- Never use `RefreshDatabase` in Dusk tests — use `DatabaseTruncation` (preferred) or `DatabaseMigrations`
-- Always call `assertNoJavaScriptErrors()` after every `visit()`
-- Always use `dusk=""` HTML attributes as selectors — never CSS classes or IDs
-- Never use `pause()` — use `waitFor()`, `waitForText()`, or `waitUntilMissing()` instead
-- Use `loginAs()` to authenticate without going through the login form
-- Extract repeated navigation into **Page Objects**
-- Extract repeated interactive UI elements into **Dusk Components**
-- Create a dedicated `.env.dusk.local` file to use a separate test database
+- Browser tests live in `tests/Browser/`.
+- Use `DatabaseTruncation` (preferred) or `DatabaseMigrations`; never `RefreshDatabase`.
+- Use only `dusk=""` selectors for test targeting.
+- Do not use `pause()`; wait for explicit UI state transitions.
 
 ## Examples
 
@@ -78,6 +97,22 @@ class InvoicePage extends Page
         $browser->click('@mark-paid-button')
                 ->waitForText('Invoice marked as paid');
     }
+
+    public function fillForm(Browser $browser, string $amount): void
+    {
+        $browser->type('@amount-input', $amount);
+    }
+
+    public function submitForm(Browser $browser): void
+    {
+        $browser->press('@submit-button');
+    }
+
+    public function assertSuccess(Browser $browser): void
+    {
+        $browser->waitForText('Invoice created')
+                ->assertSee('Invoice created');
+    }
 }
 ```
 
@@ -87,6 +122,12 @@ $browser->waitFor('@invoice-table');          // ❌ pause(3000)
 $browser->waitForText('Invoice created');     // ❌ pause(2000)
 $browser->waitUntilMissing('@loading-spinner'); // ❌ pause(5000)
 ```
+
+## Testing Guidance
+
+- Run all browser tests: `php artisan dusk`.
+- Run a specific file: `php artisan dusk tests/Browser/InvoiceFlowTest.php`.
+- Use CI-friendly headless Chrome settings and isolate Dusk database from local dev DB.
 
 ## Anti-Patterns
 
