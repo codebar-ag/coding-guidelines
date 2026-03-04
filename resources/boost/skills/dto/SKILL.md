@@ -47,7 +47,7 @@ Accepts an Eloquent model and reads attributes via `$model->getAttribute()` or `
 #### `fromRequest(FormRequest $request): static`
 Reads from a validated Form Request. Prefer `$request->validated()` to ensure only validated fields are passed, then delegate to `fromArray()`.
 
-#### `fromCollection(Collection $collection): static` *(collection of DTOs)*
+#### `fromCollection(Collection $collection): Collection` *(collection of DTOs)*
 Returns a `Collection` (or typed array) of DTO instances. Use `$collection->map(...)` internally.
 
 Not every DTO needs all four factories — add only those that match real call-sites. At minimum, provide `fromArray()`.
