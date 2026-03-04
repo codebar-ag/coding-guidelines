@@ -460,7 +460,7 @@ Use a manual readonly DTO when you need zero dependencies, full control over map
 
 ## References
 
-- [Laravel Arr & data_get Helpers](https://laravel.com/docs/12.x/helpers) — `Arr::get()`, `data_get()`, `data_fill()`, `data_set()`
+- [Laravel Arr & data_get Helpers](https://laravel.com/docs/helpers) — `Arr::get()`, `data_get()`, `data_fill()`, `data_set()`
 - [PHP Readonly Classes](https://www.php.net/manual/en/language.oop5.readonly-properties.php)
 - [spatie/laravel-data — Creating a Data Object](https://spatie.be/docs/laravel-data/v4/as-a-data-transfer-object/creating-a-data-object)
 - [spatie/laravel-data — From a Model](https://spatie.be/docs/laravel-data/v4/as-a-data-transfer-object/model-to-data-object)
