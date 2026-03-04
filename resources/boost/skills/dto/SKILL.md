@@ -346,7 +346,7 @@ use App\Models\Order;
 use App\Services\Shipping\DataObjects\OrderData;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class OrderDataTest extends TestCase
 {
