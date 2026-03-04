@@ -185,9 +185,11 @@ it('supports invoice CRUD operations', function () {
     $fresh->update(['amount' => '250.00']);
     $this->assertDatabaseHas('invoices', ['id' => $fresh->id, 'amount' => '250.00']);
 
-    // Delete
+    // Delete (supports soft deletes)
     $fresh->delete();
-    $this->assertDatabaseMissing('invoices', ['id' => $fresh->id]);
+    $this->assertSoftDeleted('invoices', ['id' => $fresh->id]);
+    // For hard-deleting models, use instead:
+    // $this->assertDatabaseMissing('invoices', ['id' => $fresh->id]);
 });
 
 it('defines and resolves invoiceLines relation', function () {
