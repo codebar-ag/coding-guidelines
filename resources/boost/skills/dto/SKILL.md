@@ -204,7 +204,7 @@ public static function fromRequest(StoreOrderRequest $request): static
 ```php
 // Validation belongs to the caller; the DTO maps only.
 $validated = $request->validated();
-$customer  = CustomerData::fromArray($apiResponse);
+$customer  = CustomerData::fromArray($validated);
 echo $customer->name;
 
 // From an Eloquent model
