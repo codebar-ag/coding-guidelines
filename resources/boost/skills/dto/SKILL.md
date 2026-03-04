@@ -82,7 +82,7 @@ Arr::get($data, 'ID') ?? Arr::get($data, 'id') ?? Arr::get($data, 'customer_id',
 
 ### 5. Write a Dedicated DTO Test
 
-Every DTO **must** have its own test class. DTO tests are pure unit tests — no HTTP calls, no database, no framework boot required. They verify that every factory method correctly maps, normalizes, and type-casts input data.
+Every DTO **must** have its own test class. DTO tests are pure unit tests — no HTTP calls and no database. They can run without booting the framework, but may extend a lightweight bootstrapped base test case (e.g. `Tests\\TestCase` via Testbench) when DTO factories depend on Eloquent models. They verify that every factory method correctly maps, normalizes, and type-casts input data.
 
 Place test files alongside the DTO's module path: `tests/Unit/Services/Billing/DataObjects/CustomerDataTest.php`.
 
