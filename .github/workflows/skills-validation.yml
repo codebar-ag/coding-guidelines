@@ -6,6 +6,10 @@ on:
       - main
   pull_request:
 
+env:
+  # Opt JavaScript-based actions into Node 24 until it is the runner default (see GitHub Actions changelog).
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -16,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
