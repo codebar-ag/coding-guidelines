@@ -8,8 +8,8 @@ Shared Laravel coding and architecture guidelines for codebar-ag projects, optim
 
 ## Requirements
 
-- **PHP:** ^8.4  
-- **Laravel:** 12.x (Illuminate 12 components)  
+- **PHP:** ^8.4 (8.4 and 8.5; SemVer caret includes any future 8.x before 9.0)  
+- **Laravel:** 12.x or 13.x (`illuminate/console` and `illuminate/support`: `^12.41.1|^13.0`)  
 - **Laravel Boost:** ^2.2 (installed automatically as a dependency)
 
 ---
@@ -270,7 +270,7 @@ If your editor supports MCP (Model Context Protocol), configure it to use the Bo
 
 ## Claude-based skills validation
 
-This package validates its own skills using Pest and the [Laravel AI SDK](https://laravel.com/docs/12.x/ai-sdk):
+This package validates its own skills using Pest and the [Laravel AI SDK](https://laravel.com/docs/12.x/ai-sdk) (see also the [13.x docs](https://laravel.com/docs/13.x/ai-sdk) when developing on Laravel 13):
 
 - **Run locally**: `vendor/bin/pest --group=skills`
 - **Environment**: Set `ANTHROPIC_API_KEY` and optionally `ANTHROPIC_MODEL` (default in `phpunit.xml.dist`: `claude-haiku-4-5`).
