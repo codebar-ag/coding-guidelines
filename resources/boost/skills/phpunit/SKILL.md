@@ -17,7 +17,7 @@ compatible_agents:
 
 ## When Not to Use
 
-- Browser/E2E flows requiring JavaScript execution (use Dusk).
+- Browser/E2E flows requiring JavaScript execution (use Pest browser, see the `pest-browser` skill).
 - New tests in a code area that is standardized on Pest syntax only.
 - Integration scenarios where external systems should be faked/stubbed at a higher level.
 
