@@ -100,7 +100,7 @@ compatible_agents:
 ```blade
 {{-- Icon-only button with ARIA label for screen readers --}}
 <button type="button" aria-label="Close dialog" class="min-h-[44px] min-w-[44px] rounded-lg focus-visible:ring-2">
-    <x-icon name="x" />
+    <x-lucide-x class="size-5" aria-hidden="true" />
 </button>
 ```
 

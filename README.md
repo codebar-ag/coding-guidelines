@@ -150,11 +150,11 @@ Skills are reusable convention and workflow guides that assistants use when work
 |----------|--------|-------------|
 | **Laravel** | General, HelperFunctions, Models, Controllers, Migrations, Routing, FormRequests | Framework conventions, config/logging, Eloquent, routes, validation |
 | **Backend** | Actions, Commands, DTO, Enums, Events, Exceptions, Helpers, Interfaces, Jobs, Middleware, Observers, Policies, Requests, Resources, Services, Traits | PHP architecture, single-purpose classes, API resources, queue jobs |
-| **Frontend** | Blade, Design, Livewire, Tailwind, Translations | Templates, design system, components, Tailwind CSS, i18n |
+| **Frontend** | Blade, Design, Icons, Livewire, Tailwind, Translations | Templates, design system, Lucide icons, components, Tailwind CSS, i18n |
 | **Testing** | PHPUnit, PestTesting, PHPStan, PestBrowser | Unit/feature tests, static analysis, browser tests |
 | **Services** | Saloon, DocuWare, Albatros | External API integrations (Saloon, DocuWare, Albatros) |
 
-**Total: 37 skills.**
+**Total: 38 skills.**
 
 ---
 
