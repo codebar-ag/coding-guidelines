@@ -42,7 +42,7 @@ compatible_agents:
 - Use Pest syntax consistently for new and refactored tests.
 - Use named HTTP assertions, not raw numeric status checks.
 - Prefer Laravel fakes for framework integrations (events, mail, queue, notifications).
-- Keep browser-test constraints aligned with Dusk guidance.
+- Keep browser-test constraints aligned with the `pest-browser` skill.
 - Never delete tests without explicit approval.
 
 ## Examples
@@ -120,15 +120,14 @@ arch('controllers have the correct suffix')
 ```
 
 ```php
-// Browser test baseline with Dusk + DatabaseTruncation
-uses(\Illuminate\Foundation\Testing\DatabaseTruncation::class);
-
+// Browser test baseline with Pest browser (Playwright), in tests/Browser
 it('submits invoice flow in browser', function () {
-    $this->browse(function (Browser $browser) {
-        $browser->visit('/invoices/create')
-            ->assertNoJavaScriptErrors()
-            ->waitFor('@submit-button');
-    });
+    $this->actingAs(User::factory()->create());
+
+    visit('/invoices/create')
+        ->assertNoJavaScriptErrors()
+        ->press('Create invoice')
+        ->assertSee('Invoice created');
 });
 ```
 
@@ -155,15 +154,15 @@ vendor/bin/pest --group=feature
 
 - Keep tests behavior-focused and easy to read at a glance.
 - Use datasets and `beforeEach()` to reduce duplication before adding new assertions.
-- For browser behavior, defer selector/waiting details to `Dusk/SKILL.md`.
+- For browser behavior, defer selector/waiting details to `pest-browser/SKILL.md`.
 
 ## Anti-Patterns
 
 - Using `assertStatus(200)` instead of named assertion methods
-- Using `RefreshDatabase` in browser (Dusk) tests — use `DatabaseTruncation`
-- Using `pause(3000)` in browser tests — use `waitFor()` or `waitForText()`
+- Using Laravel Dusk for browser tests — use Pest browser (`pest-browser` skill)
+- Using fixed waits (`wait(3)`) in browser tests — use waiting assertions such as `assertSee()`
 - Repeating the same test for multiple inputs instead of using datasets
-- Using CSS class or ID selectors in Dusk — use `dusk=""` attributes
+- Using CSS class selectors in browser tests — use text, labels or `data-testid` (`@name`)
 - Missing `uses(RefreshDatabase::class)` in feature/unit files that touch the database
 - Deleting a test without explicit approval
 - Missing `assertNoJavaScriptErrors()` after `visit()` in browser tests
@@ -172,5 +171,5 @@ vendor/bin/pest --group=feature
 
 - [Pest PHP Documentation](https://pestphp.com/)
 - [Laravel Testing](https://laravel.com/docs/testing)
-- Related: `Dusk/SKILL.md` — full browser (E2E) test conventions
+- Related: `pest-browser/SKILL.md` — full browser (E2E) test conventions
 - Related: `PHPStan/SKILL.md` — static analysis runs alongside tests

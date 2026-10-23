@@ -43,7 +43,7 @@ Use these roles when prompting Claude Desktop/Terminal, other Boost-aware tools,
 - **TestAgent**
   - Ensures test coverage and static analysis match the architecture.
   - Responsible for: adding/improving tests, fixtures, and static analysis configuration.
-  - Primary skills: `phpunit`, `pesttesting`, `phpstan`, `dusk`, plus whichever domain skills apply to the code under test.
+  - Primary skills: `phpunit`, `pesttesting`, `phpstan`, `pest-browser`, plus whichever domain skills apply to the code under test.
 
 - **ReviewAgent**
   - Reviews changes and challenges decisions against the skills and rules.

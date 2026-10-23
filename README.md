@@ -107,7 +107,7 @@ Copy-paste and adapt these when talking to Claude Desktop/Terminal with Boost en
   ```text
   Act as TestAgent.
 
-  Apply the phpunit, pesttesting, phpstan, and dusk skills to improve tests and static analysis for these changes.
+  Apply the phpunit, pesttesting, phpstan, and pest-browser skills to improve tests and static analysis for these changes.
   Propose concrete test files and assertions, and any PHPStan configuration updates needed:
   - [paste diff or files]
   ```
@@ -135,7 +135,7 @@ Conceptually, this package covers:
 - **Laravel conventions**: routes, controllers, configuration, models, migrations, form requests, helper functions.
 - **Backend architecture**: actions, services, DTOs, enums, events, exceptions, helpers, interfaces, jobs, middleware, observers, policies, requests, resources, traits.
 - **Frontend & UI**: Blade templates, design system, Livewire components, Tailwind CSS, translations.
-- **Testing & quality**: PHPUnit, Pest, PHPStan, Dusk and testing best practices.
+- **Testing & quality**: PHPUnit, Pest, PHPStan, Pest browser (Playwright) and testing best practices.
 - **External services**: Saloon integrations, DocuWare, Albatros and other service boundaries.
 
 Each area is implemented as a dedicated skill so AI assistants can follow focused, repeatable guidance.
@@ -151,7 +151,7 @@ Skills are reusable convention and workflow guides that assistants use when work
 | **Laravel** | General, HelperFunctions, Models, Controllers, Migrations, Routing, FormRequests | Framework conventions, config/logging, Eloquent, routes, validation |
 | **Backend** | Actions, Commands, DTO, Enums, Events, Exceptions, Helpers, Interfaces, Jobs, Middleware, Observers, Policies, Requests, Resources, Services, Traits | PHP architecture, single-purpose classes, API resources, queue jobs |
 | **Frontend** | Blade, Design, Livewire, Tailwind, Translations | Templates, design system, components, Tailwind CSS, i18n |
-| **Testing** | PHPUnit, PestTesting, PHPStan, Dusk | Unit/feature tests, static analysis, browser tests |
+| **Testing** | PHPUnit, PestTesting, PHPStan, PestBrowser | Unit/feature tests, static analysis, browser tests |
 | **Services** | Saloon, DocuWare, Albatros | External API integrations (Saloon, DocuWare, Albatros) |
 
 **Total: 37 skills.**
