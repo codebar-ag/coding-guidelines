@@ -110,6 +110,7 @@ Each touched UI type below must be reviewed for dedicated component extraction a
 - [ ] All interactive controls have visible `focus-visible` states.
 - [ ] Touch targets for interactive controls follow minimum usable size (`min-h-[44px]` / `min-w-[44px]` where relevant).
 - [ ] Icon-only controls provide `aria-label` or equivalent accessible name.
+- [ ] Icons use Lucide (`<x-lucide-… />`, `lucide-vue-next`); brand logos use Simple Icons; no Font Awesome (see the `icons` skill).
 - [ ] Disabled, empty, loading, success, and error states are visually and semantically represented where applicable.
 - [ ] Keyboard navigation flow is preserved for updated interactions.
 - [ ] Orientation/viewport edge cases are reviewed for key interactions (mobile portrait/landscape, tablet portrait/landscape, desktop baseline widths).
